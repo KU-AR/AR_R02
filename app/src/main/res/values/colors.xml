@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorPrimary">#38A399</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorMain">#BAE8DA</color>
-    <color name="colorSub">#7BBDA9</color>
-    <color name="wallet_hint_foreground_holo_dark">#00574B</color>
-</resources>
