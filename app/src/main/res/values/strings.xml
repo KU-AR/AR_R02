@@ -1,0 +1,67 @@
+<resources>
+    <string name="title_activity_spot_main">SpotMainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="description1">background</string>
+    <string name="description2">picture</string>
+
+    <!-- トップ画面 -->
+    <string name="app_name">Memorial_App</string>
+    <string name="route_visit">Route visit</string>
+    <string name="spot_list">Spot list</string>
+    <string name="setting">Setting</string>
+
+    <!-- ルート見学画面 -->
+    <string name="route_visit_caption">Select a route determination method.</string>
+
+    <string name="choice_time">Decide by time</string>
+    <string name="choice_time_caption">Please select a tour time.</string>
+    <string name="choice_time_30">30min</string>
+    <string name="choice_time_60">60min</string>
+    <string name="choice_time_90">90min</string>
+    <string name="choice_time_120">120min</string>
+    <string name="choice_time_150">150min</string>
+
+    <string name="choice_spot">Decide by spot</string>
+    <string name="choice_spot_caption">Please select a spot.</string>
+    <string name="choice_spot_selected">3 locations selected</string>
+
+    <!-- スポット一覧 -->
+    <string name="spot_list_narrowing">narrowing</string>
+    <string name="spot_list_sorting">Sorting</string>
+
+    <string name="arahama_school">Sendai Arahama Elementary School</string>
+
+    <!-- スポットAR -->
+    <string name="spot_ar">Spot AR</string>
+
+    <!-- メモリーフロート -->
+    <string name="memory_float">Memory float</string>
+    <string name="memory_float_post_caption">"*" is Mandatory field</string>
+    <string name="memory_post">Memory Post</string>
+    <string name="post">Post</string>
+    <string name="confirmation">Confirmation</string>
+
+    <string name="poster_information">Poster information</string>
+    <string name="nickname">*Nickname</string>
+    <string name="age">Age</string>
+    <string name="job">Job</string>
+    <string name="past_address">Past address</string>
+    <string name="current_address">Current address</string>
+
+    <string name="memory_information">Memory information</string>
+    <string name="memory">*Memory</string>
+    <string name="time_series">*Time series</string>
+    <string name="picture">Picture</string>
+    <string name="emotion">*Emotion</string>
+
+    <string name="check_message">Please check your entries.</string>
+    <string name="not_entered">Not entered</string>
+
+    <!--test-->
+    <string name="cast_tracks_chooser_dialog_ok">*Cast tracks chooser dialog ok</string>
+
+    <!-- 設定 -->
+    <string name="close">Close</string>
+</resources>

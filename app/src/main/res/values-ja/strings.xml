@@ -1,0 +1,64 @@
+<resources>
+    <string name="title_activity_spot_main">SpotMainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="description1">background</string>
+    <string name="description2">picture</string>
+
+    <!-- トップ画面 -->
+    <string name="app_name">せんだい3.11(仮)</string>
+    <string name="route_visit">ルート見学</string>
+    <string name="spot_list">スポット一覧</string>
+    <string name="setting">設定</string>
+
+    <!-- ルート見学画面 -->
+    <string name="route_visit_caption">ルート決定方法を選択して下さい</string>
+
+    <string name="choice_time">見学時間で選ぶ</string>
+    <string name="choice_time_caption">希望の見学時間を選択してください</string>
+    <string name="choice_time_30">30分</string>
+    <string name="choice_time_60">60分</string>
+    <string name="choice_time_90">90分</string>
+    <string name="choice_time_120">120分</string>
+    <string name="choice_time_150">150分</string>
+
+    <string name="choice_spot">スポットで選ぶ</string>
+    <string name="choice_spot_caption">行きたいスポットを選択してください</string>
+    <string name="choice_spot_selected">3箇所選択中</string>
+
+    <!-- スポット一覧 -->
+    <string name="spot_list_narrowing">絞り込み</string>
+    <string name="spot_list_sorting">並び替え</string>
+
+    <string name="arahama_school">仙台市立荒浜小学校</string>
+
+    <!-- スポットAR -->
+    <string name="spot_ar">スポットAR</string>
+
+    <!-- メモリーフロート -->
+    <string name="memory_float">メモリーフロート</string>
+    <string name="memory_float_post_caption">*は必須入力です</string>
+    <string name="memory_post">メモリー投稿</string>
+    <string name="post">投稿</string>
+    <string name="confirmation">確認</string>
+
+    <string name="poster_information">投稿者情報</string>
+    <string name="nickname">*ニックネーム</string>
+    <string name="age">年齢</string>
+    <string name="job">職業</string>
+    <string name="past_address">当時の居住地</string>
+    <string name="current_address">現在の居住地</string>
+
+    <string name="memory_information">メモリー情報</string>
+    <string name="memory">*メモリー</string>
+    <string name="time_series">*時系列</string>
+    <string name="picture">写真</string>
+    <string name="emotion">*感情</string>
+
+    <string name="check_message">入力内容を確認してください</string>
+    <string name="not_entered">未入力</string>
+
+    <!-- 設定 -->
+    <string name="close">閉じる</string>
+</resources>
