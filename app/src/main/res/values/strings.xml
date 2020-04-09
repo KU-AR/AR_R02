@@ -41,6 +41,7 @@
     <string name="memory_float_post_caption">"*" is Mandatory field</string>
     <string name="memory_post">Memory Post</string>
     <string name="post">Post</string>
+    <string name="confirmation">Confirmation</string>
 
     <string name="poster_information">Poster information</string>
     <string name="nickname">*Nickname</string>
@@ -54,6 +55,12 @@
     <string name="time_series">*Time series</string>
     <string name="picture">Picture</string>
     <string name="emotion">*Emotion</string>
+
+    <string name="check_message">Please check your entries.</string>
+    <string name="not_entered">Not entered</string>
+
+    <!--test-->
+    <string name="cast_tracks_chooser_dialog_ok">*Cast tracks chooser dialog ok</string>
 
     <!-- 設定 -->
     <string name="close">Close</string>

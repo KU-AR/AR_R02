@@ -61,14 +61,15 @@
             android:layout_height="match_parent"
             android:background="#00FFFFFF">
 
+
         </androidx.recyclerview.widget.RecyclerView>
 
-        <Button
+<!--        <Button
             android:id="@+id/ButtonArahama"
             android:layout_width="match_parent"
-            android:layout_height="295dp"
+            android:layout_height="match_parent"
             android:background="#00FFFFFF"
-            android:onClick="onButton1" />
+            android:onClick="onButton1" />-->
 
 
     </RelativeLayout>
@@ -97,7 +98,8 @@
             android:backgroundTint="@color/colorPrimary"
             android:text="@string/spot_list_narrowing"
             android:textColor="#FFFFFF"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:onClick="onButton2"/>
 
         <Button
             android:id="@+id/button5"
@@ -112,7 +114,8 @@
             android:backgroundTint="@color/colorPrimary"
             android:text="@string/spot_list_sorting"
             android:textColor="#FFFFFF"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:onClick="onButton3"/>
     </LinearLayout>
 
 

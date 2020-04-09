@@ -80,11 +80,11 @@
                 android:text="@string/poster_information"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/nickName"
+                android:id="@+id/NickName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
@@ -123,7 +123,7 @@
                 android:textSize="18sp" />
 
             <EditText
-                android:id="@+id/pastAddress"
+                android:id="@+id/PastAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
@@ -159,7 +159,7 @@
                 android:text="@string/memory_information"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
@@ -189,19 +189,6 @@
                 android:textSize="18sp" />
 
             <EditText
-                android:id="@+id/Picture"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="40dp"
-                android:ems="10"
-                android:hint="@string/picture"
-                android:inputType="textPersonName"
-                android:paddingStart="15dp"
-                android:textSize="18sp" />
-
-            <EditText
                 android:id="@+id/Emotion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -214,8 +201,21 @@
                 android:paddingStart="15dp"
                 android:textSize="18sp" />
 
+            <EditText
+                android:id="@+id/Picture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="40dp"
+                android:ems="10"
+                android:hint="@string/picture"
+                android:inputType="textPersonName"
+                android:paddingStart="15dp"
+                android:textSize="18sp" />
+
             <Button
-                android:id="@+id/MemoryPost"
+                android:id="@+id/ConfirmationButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
@@ -228,12 +228,15 @@
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
+                android:onClick="sendMessage"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp"
-                android:text="@string/post"
+                android:text="@string/confirmation"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+
 
         </LinearLayout>
     </ScrollView>

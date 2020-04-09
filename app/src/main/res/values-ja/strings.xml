@@ -41,6 +41,7 @@
     <string name="memory_float_post_caption">*は必須入力です</string>
     <string name="memory_post">メモリー投稿</string>
     <string name="post">投稿</string>
+    <string name="confirmation">確認</string>
 
     <string name="poster_information">投稿者情報</string>
     <string name="nickname">*ニックネーム</string>
@@ -54,6 +55,9 @@
     <string name="time_series">*時系列</string>
     <string name="picture">写真</string>
     <string name="emotion">*感情</string>
+
+    <string name="check_message">入力内容を確認してください</string>
+    <string name="not_entered">未入力</string>
 
     <!-- 設定 -->
     <string name="close">閉じる</string>
