@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject spot = spots.getJSONObject(valueOf(i+1));
                 ContentValues values = new ContentValues();
                 values.put(MyTable.COL_ID, spot.getString("spots_id"));
+                values.put(MyTable.COL_UPDATED_AT, spot.getString("spots_updated_at"));
+                values.put(MyTable.COL_CREATED_AT, spot.getString("spots_created_at"));
                 values.put(MyTable.COL_NAME, spot.getString("spots_name"));
                 values.put(MyTable.COL_RUBY, spot.getString("spots_ruby"));
                 values.put(MyTable.COL_DESCRIPTION, spot.getString("spots_description"));
@@ -193,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
         // SELECT
         String[] projection = { // SELECT する列
                 MyTable.COL_ID,
+                MyTable.COL_UPDATED_AT,
+                MyTable.COL_CREATED_AT,
                 MyTable.COL_NAME,
                 MyTable.COL_RUBY,
                 MyTable.COL_DESCRIPTION,

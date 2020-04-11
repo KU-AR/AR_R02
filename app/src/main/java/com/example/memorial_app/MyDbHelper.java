@@ -17,6 +17,8 @@ public class MyDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + MyTable.TABLE_NAME + " (" +
                     MyTable.COL_ID + " INTEGER PRIMARY KEY," +
+                    MyTable.COL_UPDATED_AT+ " NUMERIC," +
+                    MyTable.COL_CREATED_AT + " NIMERIC," +
                     MyTable.COL_NAME + " TEXT," +
                     MyTable.COL_RUBY + " TEXT," +
                     MyTable.COL_DESCRIPTION + " TEXT," +

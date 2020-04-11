@@ -5,6 +5,8 @@ import java.util.Comparator;
 
 public class MyClass {
     private int itemIds;
+    private String itemUpdated_at;
+    private String itemCreated_at;
     private String itemNames;
     private String itemRubys;
     private String itemCaptions;
@@ -14,8 +16,10 @@ public class MyClass {
 
     private Float itemDistances;
 
-    public MyClass(int itemIds, String itemNames, String itemRubys, String itemCaptions, Float itemLatitudes, Float itemLongitudes, String itemImages, Float itemDistances){
+    public MyClass(int itemIds, String itemUpdated_at, String itemCreated_at, String itemNames, String itemRubys, String itemCaptions, Float itemLatitudes, Float itemLongitudes, String itemImages, Float itemDistances){
         this.itemIds = itemIds;
+        this.itemUpdated_at = itemUpdated_at;
+        this.itemCreated_at = itemCreated_at;
         this.itemNames = itemNames;
         this.itemRubys = itemRubys;
         this.itemCaptions = itemCaptions;
@@ -27,6 +31,12 @@ public class MyClass {
 
     public int getItemIds(){
         return itemIds;
+    }
+    public String getItemUpdated_at(){
+        return itemUpdated_at;
+    }
+    public String getItemCreated_at(){
+        return itemCreated_at;
     }
     public String getItemNames(){
         return itemNames;

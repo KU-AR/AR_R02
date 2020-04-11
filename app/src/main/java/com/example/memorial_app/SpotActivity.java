@@ -53,6 +53,8 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
     private static double longitude = 0;
 
     static List<Integer> itemIds = new ArrayList<Integer>();
+    static List<String> itemUpdated_at = new ArrayList<String>();
+    static List<String> itemCreated_at = new ArrayList<String>();
     static List<String> itemNames = new ArrayList<String>();
     static List<String> itemRubys = new ArrayList<String>();
     static List<String> itemCaptions = new ArrayList<String>();
@@ -163,6 +165,7 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         reload();
     }
 
+    //各種変数がリセットされる場合は使用不可(flagがリセットされるため)
     private void reload() {
         Intent intent = getIntent();
         overridePendingTransition(0, 0);
@@ -234,6 +237,8 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         // SELECT
         String[] projection = { // SELECT する列
                 MyDbContract.MyTable.COL_ID,
+                MyDbContract.MyTable.COL_UPDATED_AT,
+                MyDbContract.MyTable.COL_CREATED_AT,
                 MyDbContract.MyTable.COL_NAME,
                 MyDbContract.MyTable.COL_RUBY,
                 MyDbContract.MyTable.COL_DESCRIPTION,
@@ -268,6 +273,8 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         );*/
         while(cursor.moveToNext()) {
             Integer id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_ID));
+            String updated_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_UPDATED_AT));
+            String created_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_CREATED_AT));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_NAME));
             String ruby = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_RUBY));
             String description = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_DESCRIPTION));
@@ -283,7 +290,7 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
             itemImages.add(image_bin);*/
 
             //距離計算はonCreateにて
-            items.add(new MyClass(id, name, ruby, description, latitude, longitude, image_bin, (Float)null));
+            items.add(new MyClass(id, updated_at, created_at, name, ruby, description, latitude, longitude, image_bin, (Float)null));
         }
         cursor.close();
     }
@@ -302,6 +309,8 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
 
         //List作成
         itemIds.clear();
+        itemUpdated_at.clear();
+        itemCreated_at.clear();
         itemNames.clear();
         itemRubys.clear();
         itemCaptions.clear();
@@ -311,6 +320,8 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         itemDistances.clear();
         for(MyClass item: items){
             itemIds.add(item.getItemIds());
+            itemUpdated_at.add(item.getItemUpdated_at());
+            itemCreated_at.add(item.getItemCreated_at());
             itemNames.add(item.getItemNames());
             itemRubys.add(item.getItemRubys());
             itemCaptions.add(item.getItemCaptions());
