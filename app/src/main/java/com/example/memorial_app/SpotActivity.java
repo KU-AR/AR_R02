@@ -1,5 +1,6 @@
 package com.example.memorial_app;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -22,9 +23,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +43,12 @@ import static java.sql.Types.NULL;
 
 
 
-public class SpotActivity extends AppCompatActivity implements LocationListener{
+public class SpotActivity extends AppCompatActivity/* implements LocationListener*/{
     private MyDbHelper mDbHelper = null;
+
+    private Context context = null;
+    RecyclerView recyclerView = null;
+    MyAdapter3 rAdapter = null;
 
     //絞り込み用フラグ default(絞り込みなし):0  1km以内:1  2km以内:2  5km以内:3 10km以内:4
     private int narrowing_flag = 0;
@@ -47,10 +57,13 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
 
     //位置情報関連
     final static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 10;
-    private LocationManager locationManager;
+//    private LocationManager locationManager;
     private GeomagneticField geomagneticField;
     private static double latitude = 0;
     private static double longitude = 0;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location location;
 
     static List<Integer> itemIds = new ArrayList<Integer>();
     static List<String> itemUpdated_at = new ArrayList<String>();
@@ -65,15 +78,15 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
 
     static ArrayList<MyClass> items = new ArrayList<>();
 
-    @Override
+/*    @Override
     public void onProviderDisabled(String provider){
     }
     @Override
     public void onProviderEnabled(String provider){
-    }
-    @Override
+    }*/
+/*    @Override
     public void onLocationChanged(Location location){
-/*        geomagneticField = new GeomagneticField((float) location.getLatitude(), (float) location.getLongitude(), (float) location.getAltitude(), new Date().getTime());
+*//*        geomagneticField = new GeomagneticField((float) location.getLatitude(), (float) location.getLongitude(), (float) location.getAltitude(), new Date().getTime());
         if(longitude == NULL && latitude == NULL){
             longitude = location.getLongitude();
             latitude = location.getLatitude();
@@ -82,7 +95,7 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         else {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
-        }*/
+        }*//*
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
@@ -94,13 +107,15 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         //再度リスト更新
         updateItemList();
 
+        reload();
         //Toast.makeText(getApplicationContext(),"onlocationchanged lat="+latitude+" lon="+longitude+"", Toast.LENGTH_SHORT).show();
         //Log.d("SpotActivity","onlocationchanged lat="+latitude+" lon="+longitude+"");
-    }
-    @Override
+    }*/
+/*    @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
+    }*/
 
+/*
     public void initLocationManager(){
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -110,9 +125,10 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS},MY_PERMISSIONS_REQUEST_READ_CONTACTS);
            }
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,50,1,this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,50,1,this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,30,this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,5000,30,this);
     }
+*/
 
 
     public void onButton2(View v){
@@ -137,7 +153,8 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
             //narrowing_flag = 0 に遷移　絞り込みなし
             narrowing_flag = 0;
         }
-        reload();
+        getLastLocation();
+        refresh();
     }
 
     public void onButton3(View v){
@@ -162,35 +179,56 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
             //sorting_flag = 0 に遷移　id順
             sorting_flag = 0;
         }
-        reload();
+        getLastLocation();
+        refresh();
     }
 
     //各種変数がリセットされる場合は使用不可(flagがリセットされるため)
-    private void reload() {
-        Intent intent = getIntent();
-        overridePendingTransition(0, 0);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        finish();
+    private void refresh() {
+        updateItemList();
+        //ソート
+        sortItem(narrowing_flag, sorting_flag);
+        //再度リスト更新
+        updateItemList();
 
-        overridePendingTransition(0, 0);
-        startActivity(intent);
+        rAdapter = new MyAdapter3(itemIds, itemNames, itemCaptions, itemLatitudes, itemLongitudes, itemImages);
+        recyclerView.setAdapter(rAdapter);
+        rAdapter.setOnItemClickListener(new MyAdapter3.onItemClickListener(){
+            @Override
+            public void onClick(View view, int id){
+                //Toast.makeText(SpotActivity.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SpotActivity.this, SpotDetailActivity.class);
+                intent.putExtra("id", id);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spot);
+        context = getApplicationContext();
 
         //位置情報関連
-        initLocationManager();
+//        initLocationManager();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        //getLastLocation();
 
         //DBからデータ取得　並び替え絞り込み実装前
         createSpot(narrowing_flag, sorting_flag);
 
+        updateItemList();
+        //ソート
+        sortItem(narrowing_flag, sorting_flag);
+        //再度リスト更新
+        updateItemList();
 
         // activity_route_choice_spot の id と 合ってるか確認すること
 
-        RecyclerView recyclerView = findViewById(R.id.my_recycler_view);
+        recyclerView = findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -202,7 +240,7 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
         recyclerView.setLayoutManager(rLayoutManager);
 
         // specify an adapter (see also next example)
-        MyAdapter3 rAdapter = new MyAdapter3(itemIds, itemNames, itemCaptions, itemLatitudes, itemLongitudes, itemImages);
+        rAdapter = new MyAdapter3(itemIds, itemNames, itemCaptions, itemLatitudes, itemLongitudes, itemImages);
         recyclerView.setAdapter(rAdapter);
         rAdapter.setOnItemClickListener(new MyAdapter3.onItemClickListener(){
             @Override
@@ -384,6 +422,26 @@ public class SpotActivity extends AppCompatActivity implements LocationListener{
             case 4:
 
         }
+        Toast.makeText(context, "絞り込み：" + String.valueOf(narrowing_flag) + "並び替え：" + String.valueOf(sorting_flag), Toast.LENGTH_SHORT).show();
+    }
+
+    private void getLastLocation(){
+        fusedLocationClient.getLastLocation()
+                .addOnCompleteListener(
+                        this,
+                        new OnCompleteListener<Location>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Location> task) {
+                                if(task.isSuccessful() && task.getResult() != null){
+                                    location = task.getResult();
+                                    latitude = location.getLatitude();
+                                    longitude = location.getLongitude();
+                                } else {
+                                    Log.d("debug", "計測不可");
+                                }
+                            }
+                        }
+                );
     }
 
 }

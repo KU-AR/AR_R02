@@ -122,11 +122,24 @@ public class MyAdapter3 extends RecyclerView.Adapter<MyAdapter3.ViewHolder> {
         });
     }
 
-
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return iNames.size();
     }
 
+    public void refreshAdapter(List<Integer> itemId, List<String> itemNames, List<String> itemCaptions, List<Float> itemLatitude, List<Float> itemLongitude, List<String> itemImages){
+        this.iId.clear();
+        this.iNames.clear();
+        this.iCaption.clear();
+        this.iLatitude.clear();
+        this.iLongitude.clear();
+        this.iImages.clear();
+        this.iId = itemId;
+        this.iNames = itemNames;
+        this.iCaption = itemCaptions;
+        this.iLatitude = itemLatitude;
+        this.iLongitude = itemLongitude;
+        this.iImages = itemImages;
+    }
 }
