@@ -17,8 +17,9 @@ public class HttpSendJSON {
         System.setProperty("proxySet", "true");
         System.setProperty("proxyHost", "http://wproxy.net.sendai-nct.ac.jp");
         System.setProperty("proxyPort", "8080");
-        final String authUser = "a1911503";
-        final String authPassword = "Megmilk193_";
+        //ここに記入（パスワード漏れ注意）
+        final String authUser = null;
+        final String authPassword = null;
         java.net.Authenticator.setDefault(
                 new Authenticator() {
                     public PasswordAuthentication getPasswordAuthentication() {

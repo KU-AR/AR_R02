@@ -4,9 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import static com.example.memorial_app.MyDbContract.MyTable;
+import static com.example.memorial_app.MyDbContract.SpotsTable;
 
-public class MyDbHelper extends SQLiteOpenHelper {
+public class MyDbSpots extends SQLiteOpenHelper {
     // スキーマに変更があれば VERSION をインクリメントします。
     public static final int DATABASE_VERSION = 1;
 
@@ -15,20 +15,20 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
     // SQLite ファイルが存在しない場合や VERSION が変更された際に実行する SQL を定義します。
     private static final String SQL_CREATE_TABLE =
-            "CREATE TABLE " + MyTable.TABLE_NAME + " (" +
-                    MyTable.COL_ID + " INTEGER PRIMARY KEY," +
-                    MyTable.COL_UPDATED_AT+ " NUMERIC," +
-                    MyTable.COL_CREATED_AT + " NIMERIC," +
-                    MyTable.COL_NAME + " TEXT," +
-                    MyTable.COL_RUBY + " TEXT," +
-                    MyTable.COL_DESCRIPTION + " TEXT," +
-                    MyTable.COL_LATITUDE + " REAL," +
-                    MyTable.COL_LONGITUDE + " REAL," +
-                    MyTable.COL_IMAGES_BIN + " BLOB)";
+            "CREATE TABLE " + SpotsTable.TABLE_NAME + " (" +
+                    SpotsTable.COL_ID + " INTEGER PRIMARY KEY," +
+                    SpotsTable.COL_UPDATED_AT+ " NUMERIC," +
+                    SpotsTable.COL_CREATED_AT + " NIMERIC," +
+                    SpotsTable.COL_NAME + " TEXT," +
+                    SpotsTable.COL_RUBY + " TEXT," +
+                    SpotsTable.COL_DESCRIPTION + " TEXT," +
+                    SpotsTable.COL_LATITUDE + " REAL," +
+                    SpotsTable.COL_LONGITUDE + " REAL," +
+                    SpotsTable.COL_IMAGES_BIN + " BLOB)";
 
-    private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + MyTable.TABLE_NAME;
+    private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + SpotsTable.TABLE_NAME;
 
-    public MyDbHelper(Context context) {
+    public MyDbSpots(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

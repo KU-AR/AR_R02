@@ -24,7 +24,7 @@
             android:background="#00D87070"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_forum_black_24dp" />
+            app:srcCompat="@drawable/ic_gps_fixed_black_24dp" />
 
         <TextView
             android:id="@+id/textView2"
@@ -34,7 +34,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@+id/imageView"
-            android:text="@string/memory_float"
+            android:text="TEST for spotAR"
             android:textAlignment="textStart"
             android:textColor="#414141"
             android:textSize="30sp"
@@ -53,10 +53,25 @@
         android:layout_weight="0.5"
         android:background="#FFFFFF"
         tools:context=".RouteChoiceSpot">
+        <!-- 上の id と context 変えるの忘れずに -->
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/my_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <!--        <Button
+            android:id="@+id/ButtonArahama"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF"
+            android:onClick="onButton1" />-->
+
+
     </RelativeLayout>
 
     <LinearLayout
@@ -81,11 +96,26 @@
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:backgroundTint="@color/colorPrimary"
-            android:onClick="onButtonPost"
-            android:text="@string/memory_post"
+            android:onClick="onButton2"
+            android:text="@string/spot_list_narrowing"
             android:textColor="#FFFFFF"
             android:textSize="24sp" />
 
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorPrimary"
+            android:onClick="onButton3"
+            android:text="@string/spot_list_sorting"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp" />
     </LinearLayout>
 
 

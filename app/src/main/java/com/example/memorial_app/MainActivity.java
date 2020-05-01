@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 
@@ -12,31 +11,14 @@ import android.view.View;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 //import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.google.android.gms.tasks.Task;
-
-import static com.example.memorial_app.MyDbContract.MyTable;
+import static com.example.memorial_app.MyDbContract.SpotsTable;
+import static com.example.memorial_app.MyDbContract.PostsTable;
 import static java.lang.String.valueOf;
 
 //http
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
-import java.net.Proxy;
-import java.net.URL;
-import java.util.Base64;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +28,10 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private static final String SPOTS_URL = "http://andolabo.sakura.ne.jp/arproject/show_spot.php";
+    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
+    private static int spots_length = 0;
+
     //private JSONObject json = null;
     private TestTask testTask;
     //private String json_string;
@@ -53,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private Context context = null;
 
     // DB を操作するためのインスタンス
-    private MyDbHelper mDbHelper = null;
+    private MyDbSpots mDbSpots = null;
+    private MyDbPosts mDbPosts = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,20 +49,22 @@ public class MainActivity extends AppCompatActivity {
 
         //initDB();
         context = getApplicationContext();
-        getSpot();
+        getSpots();
+        for(int index = 0; index < spots_length; index++){
+            getPosts(index);
+        }
 
 
         //System.out.println("test");
     }
 
     //見学スポット取得
-    public void getSpot(){
-        final String strPostUrl = "http://andolabo.sakura.ne.jp/arproject/show_spot.php";
+    public void getSpots(){
         final String json_input = "{\"test\":\"abc\"}";
         testTask = new TestTask(this);
         testTask.setListener(createListener());
-        testTask.execute(strPostUrl, json_input);
-        Toast.makeText(context, "スポット入手開始", Toast.LENGTH_SHORT).show();
+        testTask.execute(SPOTS_URL, json_input);
+        Toast.makeText(context, "スポット取得開始", Toast.LENGTH_SHORT).show();
 
 /*        while(json_string == null){
             try {
@@ -97,9 +86,18 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
-    public void initDB(String result){
+    //メモリーフロート取得,スポット一か所分
+    public void getPosts(int spot_id){
+        final String json_input = "{\"spots_id\":\"" + String.valueOf(spot_id) + "\"}";
+        testTask = new TestTask(this);
+        testTask.setListener(createListener());
+        testTask.execute(POSTS_URL, json_input);
+        Toast.makeText(context, "スポットID：" + String.valueOf(spot_id) + "　メモリーフロート取得開始", Toast.LENGTH_SHORT).show();
+    }
 
-        Toast.makeText(context, "DB作成開始", Toast.LENGTH_SHORT).show();
+    public void initDBSpots(String result){
+
+        Toast.makeText(context, "スポットDB作成開始", Toast.LENGTH_SHORT).show();
 
         //データ取得処理
         //json = getSpot();
@@ -112,33 +110,34 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        mDbHelper = new MyDbHelper(getApplicationContext());
-        SQLiteDatabase reader = mDbHelper.getReadableDatabase();
-        SQLiteDatabase writer = mDbHelper.getWritableDatabase();
+        mDbSpots = new MyDbSpots(getApplicationContext());
+        SQLiteDatabase reader = mDbSpots.getReadableDatabase();
+        SQLiteDatabase writer = mDbSpots.getWritableDatabase();
 
         // INSERT
+        spots_length = spots.length();
         for(int i = 0; i < spots.length(); i++){
             try {
                 JSONObject spot = spots.getJSONObject(valueOf(i+1));
                 ContentValues values = new ContentValues();
-                values.put(MyTable.COL_ID, spot.getString("spots_id"));
-                values.put(MyTable.COL_UPDATED_AT, spot.getString("spots_updated_at"));
-                values.put(MyTable.COL_CREATED_AT, spot.getString("spots_created_at"));
-                values.put(MyTable.COL_NAME, spot.getString("spots_name"));
-                values.put(MyTable.COL_RUBY, spot.getString("spots_ruby"));
-                values.put(MyTable.COL_DESCRIPTION, spot.getString("spots_description"));
-                values.put(MyTable.COL_LATITUDE, spot.getString("spots_latitude"));
-                values.put(MyTable.COL_LONGITUDE, spot.getString("spots_longitude"));
-                values.put(MyTable.COL_IMAGES_BIN, spot.getString("spots_images_bin"));
-                writer.insert(MyTable.TABLE_NAME, null, values);
+                values.put(SpotsTable.COL_ID, spot.getString("spots_id"));
+                values.put(SpotsTable.COL_UPDATED_AT, spot.getString("spots_updated_at"));
+                values.put(SpotsTable.COL_CREATED_AT, spot.getString("spots_created_at"));
+                values.put(SpotsTable.COL_NAME, spot.getString("spots_name"));
+                values.put(SpotsTable.COL_RUBY, spot.getString("spots_ruby"));
+                values.put(SpotsTable.COL_DESCRIPTION, spot.getString("spots_description"));
+                values.put(SpotsTable.COL_LATITUDE, spot.getString("spots_latitude"));
+                values.put(SpotsTable.COL_LONGITUDE, spot.getString("spots_longitude"));
+                values.put(SpotsTable.COL_IMAGES_BIN, spot.getString("spots_images_bin"));
+                writer.insert(SpotsTable.TABLE_NAME, null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        Toast.makeText(context, "DB作成終了", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "スポットDB作成終了", Toast.LENGTH_SHORT).show();
 
-        checkDB();
+        checkDBSpots();
         //System.out.println(checkDB());
 
 /*        // SELECT
@@ -183,33 +182,95 @@ public class MainActivity extends AppCompatActivity {
                 updateSelectionArgs);*/
     }
 
-    public void checkDB(){
+    public void initDBPosts(String json_input, String result){
+        //スポットID取得
+        String spots_id = null;
+        try{
+            JSONObject json = new JSONObject(result);
+            spots_id = json.getString("spots_id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        //debug
+        Toast.makeText(context, "メモリーフロートDB(" +
+                "スポットID:" + spots_id +
+                "作成開始", Toast.LENGTH_SHORT).show();
+
+        //データ取得処理
+        JSONObject posts = null;
+        try{
+            JSONObject json = new JSONObject(result);
+            posts = json.getJSONObject("Post_all").getJSONObject("posts");
+        }
+        catch(JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        mDbPosts = new MyDbPosts(getApplicationContext());
+        SQLiteDatabase reader = mDbPosts.getReadableDatabase();
+        SQLiteDatabase writer = mDbPosts.getWritableDatabase();
+
+        // INSERT
+        int posts_length = posts.length();
+        for(int i = 0; i < posts_length; i++){
+            try {
+                JSONObject post = posts.getJSONObject(valueOf(i+1));
+                ContentValues values = new ContentValues();
+                values.put(PostsTable.COL_ID, post.getString("posts_id"));
+                values.put(PostsTable.COL_SPOTS_ID, spots_id);
+                values.put(PostsTable.COL_UPDATED_AT, post.getString("posts_updated_at"));
+                values.put(PostsTable.COL_NICKNAME, post.getString("posts_nickname"));
+                values.put(PostsTable.COL_PAST_ADDRESS, post.getString("posts_past_address"));
+                values.put(PostsTable.COL_CURRENT_ADDRESS, post.getString("posts_current_address"));
+                values.put(PostsTable.COL_AGE, post.getString("posts_age"));
+                values.put(PostsTable.COL_JOB, post.getString("posts_job"));
+                values.put(PostsTable.COL_MEMORY, post.getString("posts_memory"));
+                values.put(PostsTable.COL_TIME, post.getString("posts_time"));
+                values.put(PostsTable.COL_EMOTION, post.getString("posts_emotion"));
+                values.put(PostsTable.COL_IMAGES_BIN, post.getString("posts_images_bin"));
+                writer.insert(PostsTable.TABLE_NAME, null, values);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //debug
+        Toast.makeText(context, "メモリーフロートDB(" +
+                "スポットID:" + spots_id +
+                "作成終了", Toast.LENGTH_SHORT).show();
+        checkDBPosts();
+    }
+
+    public void checkDBSpots(){
 
         //Toast.makeText(context, "DBチェック開始", Toast.LENGTH_SHORT).show();
 
-        //mDbHelper = new MyDbHelper(getApplicationContext());
-        SQLiteDatabase reader = mDbHelper.getReadableDatabase();
+        //mDbHelper = new MyDbSpots(getApplicationContext());
+        SQLiteDatabase reader = mDbSpots.getReadableDatabase();
         //SQLiteDatabase writer = mDbHelper.getWritableDatabase();
 
 
         // SELECT
         String[] projection = { // SELECT する列
-                MyTable.COL_ID,
-                MyTable.COL_UPDATED_AT,
-                MyTable.COL_CREATED_AT,
-                MyTable.COL_NAME,
-                MyTable.COL_RUBY,
-                MyTable.COL_DESCRIPTION,
-                MyTable.COL_LATITUDE,
-                MyTable.COL_LONGITUDE,
-                MyTable.COL_IMAGES_BIN
+                SpotsTable.COL_ID,
+                SpotsTable.COL_UPDATED_AT,
+                SpotsTable.COL_CREATED_AT,
+                SpotsTable.COL_NAME,
+                SpotsTable.COL_RUBY,
+                SpotsTable.COL_DESCRIPTION,
+                SpotsTable.COL_LATITUDE,
+                SpotsTable.COL_LONGITUDE,
+                SpotsTable.COL_IMAGES_BIN
         };
 
-        String selection = MyTable.COL_ID + " = ?"; // WHERE 句
+        String selection = SpotsTable.COL_ID + " = ?"; // WHERE 句
         String[] selectionArgs = { "1" };
-        String sortOrder = MyTable.COL_ID + " ASC"; // ORDER 句
+        String sortOrder = SpotsTable.COL_ID + " ASC"; // ORDER 句
         Cursor cursor = reader.query(
-                MyTable.TABLE_NAME, // The table to query
+                SpotsTable.TABLE_NAME, // The table to query
                 projection,         // The columns to return
                 selection,          // The columns for the WHERE clause
                 selectionArgs,      // The values for the WHERE clause
@@ -227,11 +288,69 @@ public class MainActivity extends AppCompatActivity {
                 sortOrder           // The sort order
         );*/
         while(cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow(MyTable.COL_ID));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(MyTable.COL_NAME));
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(SpotsTable.COL_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(SpotsTable.COL_NAME));
             //Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
             //System.out.println("id: " + String.valueOf(id) + ", name: " + name);
             Log.d(TAG, "id: " + String.valueOf(id) + ", name: " + name);
+        }
+        cursor.close();
+
+        //Toast.makeText(context, "DBチェック終了", Toast.LENGTH_SHORT).show();
+    }
+
+    public void checkDBPosts(){
+
+        //Toast.makeText(context, "DBチェック開始", Toast.LENGTH_SHORT).show();
+
+        //mDbHelper = new MyDbPosts(getApplicationContext());
+        SQLiteDatabase reader = mDbPosts.getReadableDatabase();
+        //SQLiteDatabase writer = mDbHelper.getWritableDatabase();
+
+
+        // SELECT
+        String[] projection = { // SELECT する列
+                PostsTable.COL_ID,
+                PostsTable.COL_SPOTS_ID,
+                PostsTable.COL_UPDATED_AT,
+                PostsTable.COL_NICKNAME,
+                PostsTable.COL_PAST_ADDRESS,
+                PostsTable.COL_CURRENT_ADDRESS,
+                PostsTable.COL_AGE,
+                PostsTable.COL_JOB,
+                PostsTable.COL_MEMORY,
+                PostsTable.COL_TIME,
+                PostsTable.COL_EMOTION,
+                PostsTable.COL_IMAGES_BIN
+        };
+
+        String selection = PostsTable.COL_ID + " = ?"; // WHERE 句
+        String[] selectionArgs = { "1" };
+        String sortOrder = PostsTable.COL_ID + " ASC"; // ORDER 句
+        Cursor cursor = reader.query(
+                PostsTable.TABLE_NAME, // The table to query
+                projection,         // The columns to return
+                selection,          // The columns for the WHERE clause
+                selectionArgs,      // The values for the WHERE clause
+                null,               // don't group the rows
+                null,               // don't filter by row groups
+                sortOrder           // The sort order
+        );
+/*        Cursor cursor = reader.query(
+                MyTable.TABLE_NAME, // The table to query
+                projection,         // The columns to return
+                selection,          // The columns for the WHERE clause
+                selectionArgs,      // The values for the WHERE clause
+                null,               // don't group the rows
+                null,               // don't filter by row groups
+                sortOrder           // The sort order
+        );*/
+        while(cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(PostsTable.COL_ID));
+            String nickname = cursor.getString(cursor.getColumnIndexOrThrow(PostsTable.COL_NICKNAME));
+            //Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
+            //System.out.println("id: " + String.valueOf(id) + ", name: " + name);
+            Log.d(TAG, "id: " + String.valueOf(id) + ", nickname: " + nickname);
         }
         cursor.close();
 
@@ -247,9 +366,15 @@ public class MainActivity extends AppCompatActivity {
     private TestTask.Listener createListener(){
         return new TestTask.Listener() {
             @Override
-            public void onSuccess(String result) {
-                //json_string = result;
-                initDB(result);
+            public void onSuccess(String strPostURL, String json_input, String result) {
+                if(strPostURL == SPOTS_URL){
+                    //json_string = result;
+                    initDBSpots(result);
+                }
+                else if(strPostURL == POSTS_URL){
+                    initDBPosts(json_input, result);
+                }
+
             }
         };
     }

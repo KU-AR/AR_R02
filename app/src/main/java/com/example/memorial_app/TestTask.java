@@ -15,6 +15,9 @@ public class TestTask extends AsyncTask<String, Integer, String> {
     Context context;
     private Activity mActivity;
 
+    String strPostUrl = null;
+    String json_input = null;
+
     public TestTask(Activity activity){
         mActivity = activity;
     }
@@ -38,8 +41,8 @@ public class TestTask extends AsyncTask<String, Integer, String> {
     @Override
     protected String doInBackground(String... params) {
         try {
-            String strPostUrl = params[0];
-            String json_input = params[1];
+            strPostUrl = params[0];
+            json_input = params[1];
             String result = HttpSendJSON.postJson(strPostUrl, json_input);
             Log.d("debug","accessed "+params[0]);
             return result;
@@ -66,7 +69,7 @@ public class TestTask extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String result) {
         if (listener != null) {
-            listener.onSuccess(result);
+            listener.onSuccess(strPostUrl, json_input, result);
         }
     }
 
@@ -75,6 +78,6 @@ public class TestTask extends AsyncTask<String, Integer, String> {
     }
 
     interface Listener {
-        void onSuccess(String result);
+        void onSuccess(String strPostURL, String json_input, String result);
     }
 }

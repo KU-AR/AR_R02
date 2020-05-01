@@ -2,22 +2,15 @@ package com.example.memorial_app;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.GeomagneticField;
-import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,25 +19,16 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 
 
-
-import static java.sql.Types.NULL;
-
-
-
 public class SpotActivity extends AppCompatActivity/* implements LocationListener*/{
-    private MyDbHelper mDbHelper = null;
+    private MyDbSpots mDbSpots = null;
 
     private Context context = null;
     RecyclerView recyclerView = null;
@@ -77,6 +61,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
     static List<Double> itemDistances = new ArrayList<Double>();
 
     static ArrayList<MyClass> items = new ArrayList<>();
+    static ArrayList<MyClass> items_copy = new ArrayList<>();
 
 /*    @Override
     public void onProviderDisabled(String provider){
@@ -185,11 +170,16 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
     //各種変数がリセットされる場合は使用不可(flagがリセットされるため)
     private void refresh() {
+        items_copy.clear();
+        items_copy = (ArrayList<MyClass>) items.clone();
         updateItemList();
         //ソート
         sortItem(narrowing_flag, sorting_flag);
         //再度リスト更新
         updateItemList();
+
+        //debug
+        Log.d("debug",itemIds.toString());
 
         rAdapter = new MyAdapter3(itemIds, itemNames, itemCaptions, itemLatitudes, itemLongitudes, itemImages);
         recyclerView.setAdapter(rAdapter);
@@ -215,16 +205,18 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        //getLastLocation();
+        getLastLocation();
 
         //DBからデータ取得　並び替え絞り込み実装前
         createSpot(narrowing_flag, sorting_flag);
 
+/*
         updateItemList();
         //ソート
         sortItem(narrowing_flag, sorting_flag);
         //再度リスト更新
         updateItemList();
+*/
 
         // activity_route_choice_spot の id と 合ってるか確認すること
 
@@ -239,7 +231,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
         recyclerView.setLayoutManager(rLayoutManager);
 
-        // specify an adapter (see also next example)
+/*        // specify an adapter (see also next example)
         rAdapter = new MyAdapter3(itemIds, itemNames, itemCaptions, itemLatitudes, itemLongitudes, itemImages);
         recyclerView.setAdapter(rAdapter);
         rAdapter.setOnItemClickListener(new MyAdapter3.onItemClickListener(){
@@ -250,7 +242,11 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 intent.putExtra("id", id);
                 startActivity(intent);
             }
-        });
+        });*/
+
+/*        getLastLocation();
+        refresh();*/
+
     }
 
     public void onClose(View v) {
@@ -268,21 +264,21 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
         items.clear();
 
-        mDbHelper = new MyDbHelper(getApplicationContext());
-        SQLiteDatabase reader = mDbHelper.getReadableDatabase();
+        mDbSpots = new MyDbSpots(getApplicationContext());
+        SQLiteDatabase reader = mDbSpots.getReadableDatabase();
         //SQLiteDatabase writer = mDbHelper.getWritableDatabase();
 
         // SELECT
         String[] projection = { // SELECT する列
-                MyDbContract.MyTable.COL_ID,
-                MyDbContract.MyTable.COL_UPDATED_AT,
-                MyDbContract.MyTable.COL_CREATED_AT,
-                MyDbContract.MyTable.COL_NAME,
-                MyDbContract.MyTable.COL_RUBY,
-                MyDbContract.MyTable.COL_DESCRIPTION,
-                MyDbContract.MyTable.COL_LATITUDE,
-                MyDbContract.MyTable.COL_LONGITUDE,
-                MyDbContract.MyTable.COL_IMAGES_BIN
+                MyDbContract.SpotsTable.COL_ID,
+                MyDbContract.SpotsTable.COL_UPDATED_AT,
+                MyDbContract.SpotsTable.COL_CREATED_AT,
+                MyDbContract.SpotsTable.COL_NAME,
+                MyDbContract.SpotsTable.COL_RUBY,
+                MyDbContract.SpotsTable.COL_DESCRIPTION,
+                MyDbContract.SpotsTable.COL_LATITUDE,
+                MyDbContract.SpotsTable.COL_LONGITUDE,
+                MyDbContract.SpotsTable.COL_IMAGES_BIN
         };
 
         /*
@@ -290,9 +286,9 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         String[] selectionArgs = { "1" };
         */
 
-        String sortOrder = MyDbContract.MyTable.COL_ID + " ASC"; // ORDER 句
+        String sortOrder = MyDbContract.SpotsTable.COL_ID + " ASC"; // ORDER 句
         Cursor cursor = reader.query(
-                MyDbContract.MyTable.TABLE_NAME, // The table to query
+                MyDbContract.SpotsTable.TABLE_NAME, // The table to query
                 projection,         // The columns to return
                 null,          // The columns for the WHERE clause
                 null,      // The values for the WHERE clause
@@ -310,15 +306,15 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 sortOrder           // The sort order
         );*/
         while(cursor.moveToNext()) {
-            Integer id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_ID));
-            String updated_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_UPDATED_AT));
-            String created_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_CREATED_AT));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_NAME));
-            String ruby = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_RUBY));
-            String description = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_DESCRIPTION));
-            Float latitude = cursor.getFloat(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_LATITUDE));
-            Float longitude = cursor.getFloat(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_LONGITUDE));
-            String image_bin = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.MyTable.COL_IMAGES_BIN));
+            Integer id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_ID));
+            String updated_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_UPDATED_AT));
+            String created_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_CREATED_AT));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_NAME));
+            String ruby = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_RUBY));
+            String description = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_DESCRIPTION));
+            Float latitude = cursor.getFloat(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_LATITUDE));
+            Float longitude = cursor.getFloat(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_LONGITUDE));
+            String image_bin = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_IMAGES_BIN));
 /*            itemIds.add(id);
             itemNames.add(name);
             itemRubys.add(ruby);
@@ -356,7 +352,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         itemLongitudes.clear();
         itemImages.clear();
         itemDistances.clear();
-        for(MyClass item: items){
+/*        for(MyClass item: items_copy){
             itemIds.add(item.getItemIds());
             itemUpdated_at.add(item.getItemUpdated_at());
             itemCreated_at.add(item.getItemCreated_at());
@@ -369,10 +365,10 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
             //距離計算
             if(latitude != 0 && longitude != 0){
-/*                double x1 = latitude*1000000;
+*//*                double x1 = latitude*1000000;
                 double y1 = longitude*1000000;
                 double x2 = item.getItemLatitudes()*1000000;
-                double y2 = item.getItemLongitudes()*1000000;*/
+                double y2 = item.getItemLongitudes()*1000000;*//*
                 double x1 = latitude;
                 double y1 = longitude;
                 double x2 = item.getItemLatitudes();
@@ -381,6 +377,42 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 double lon_dis = Math.abs(y1-y2) * lon;
                 double distance = Math.sqrt(Math.pow(lat_dis, 2) + Math.pow(lon_dis, 2));
                 itemDistances.add(distance);
+                //itemへのsetでうまくいくか未確認
+                item.setItemDistances((float) distance);
+                Log.d("Distance Debug: ", String.valueOf(distance));
+            }
+            else{
+                //現在地取得できていない
+                ;
+            }
+        }*/
+        for(int index = 0; index < items_copy.size(); index++){
+            itemIds.add(items_copy.get(index).getItemIds());
+            itemUpdated_at.add(items_copy.get(index).getItemUpdated_at());
+            itemCreated_at.add(items_copy.get(index).getItemCreated_at());
+            itemNames.add(items_copy.get(index).getItemNames());
+            itemRubys.add(items_copy.get(index).getItemRubys());
+            itemCaptions.add(items_copy.get(index).getItemCaptions());
+            itemLatitudes.add(items_copy.get(index).getItemLatitudes());
+            itemLongitudes.add(items_copy.get(index).getItemLongitudes());
+            itemImages.add(items_copy.get(index).getItemImages());
+
+            //距離計算
+            if(latitude != 0 && longitude != 0){
+/*                double x1 = latitude*1000000;
+                double y1 = longitude*1000000;
+                double x2 = items_copy.get(index).getItemLatitudes()*1000000;
+                double y2 = items_copy.get(index).getItemLongitudes()*1000000;*/
+                double x1 = latitude;
+                double y1 = longitude;
+                double x2 = items_copy.get(index).getItemLatitudes();
+                double y2 = items_copy.get(index).getItemLongitudes();
+                double lat_dis = Math.abs(x1-x2) * lat;
+                double lon_dis = Math.abs(y1-y2) * lon;
+                double distance = Math.sqrt(Math.pow(lat_dis, 2) + Math.pow(lon_dis, 2));
+                itemDistances.add(distance);
+                //itemへのsetでうまくいくか未確認
+                items_copy.get(index).setItemDistances((float) distance);
                 Log.d("Distance Debug: ", String.valueOf(distance));
             }
             else{
@@ -393,35 +425,69 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
     public void sortItem(int narrowing_flag, int sorting_flag){
         //itemを絞り込み、並び替え
         //latitude1°は110.9463km     仙台駅　　（緯度：38.26°、緯度： 140.88°）　経度 1°の距離： 87.4082Km
+
+        ArrayList<MyClass> temp = new ArrayList<>();
+
         //並び替え用フラグ default(登録id順):0  距離順:1  五十音順:2 メモリーフロート数順:3　 更新順:4
+        switch(sorting_flag){
+            case 0:
+                Collections.sort(items_copy, new IdComp());
+                break;
+            case 1:
+                Collections.sort(items_copy, new DistanceComp());
+                break;
+            case 2:
+                Collections.sort(items_copy, new RubyComp());
+                break;
+            case 3:
+                //メモリーフロート数取得後に実装
+                break;
+            case 4:
+                Collections.sort(items_copy, new UpdateComp());
+        }
 
         //絞り込み用フラグ default(絞り込みなし):0  1km以内:1  2km以内:2  5km以内:3 10km以内:4
         switch(narrowing_flag){
             case 0:
+                for(MyClass item : items_copy){
+                    Log.d("debug", "distance:" + item.getItemDistances().toString());
+                        temp.add(item);
+                }
                 break;
             case 1:
-
+                for(MyClass item : items_copy){
+                    Log.d("debug", "distance:" + item.getItemDistances().toString());
+                    if(item.getItemDistances() < 1){
+                        temp.add(item);
+                    }
+                }
                 break;
             case 2:
+                for(MyClass item : items_copy){
+                    Log.d("debug", "distance:" + item.getItemDistances().toString());
+                    if(item.getItemDistances() < 2){
+                        temp.add(item);
+                    }
+                }
                 break;
             case 3:
+                for(MyClass item : items_copy){
+                    Log.d("debug", "distance:" + item.getItemDistances().toString());
+                    if(item.getItemDistances() < 5){
+                        temp.add(item);
+                    }
+                }
                 break;
             case 4:
-
+                for(MyClass item : items_copy){
+                    Log.d("debug", "distance:" + item.getItemDistances().toString());
+                    if(item.getItemDistances() < 10){
+                        temp.add(item);
+                    }
+                }
         }
-
-        switch(sorting_flag){
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-
-        }
+        items_copy.clear();
+        items_copy = (ArrayList<MyClass>) temp.clone();
         Toast.makeText(context, "絞り込み：" + String.valueOf(narrowing_flag) + "並び替え：" + String.valueOf(sorting_flag), Toast.LENGTH_SHORT).show();
     }
 
@@ -436,6 +502,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                                     location = task.getResult();
                                     latitude = location.getLatitude();
                                     longitude = location.getLongitude();
+                                    refresh();
                                 } else {
                                     Log.d("debug", "計測不可");
                                 }

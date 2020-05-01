@@ -59,6 +59,8 @@ public class MyClass {
     public Float getItemDistances(){
         return itemDistances;
     }
+
+    public void setItemDistances(Float distance) { this.itemDistances = distance; }
 }
 
 class RubyComp implements Comparator<MyClass> {
@@ -88,5 +90,11 @@ class DistanceComp implements Comparator<MyClass> {
         } else {
             return c1.getItemRubys().compareTo(c2.getItemRubys());
         }
+    }
+}
+
+class UpdateComp implements Comparator<MyClass> {
+    public int compare(MyClass c1, MyClass c2) {
+        return c1.getItemUpdated_at().compareTo(c2.getItemUpdated_at());
     }
 }
