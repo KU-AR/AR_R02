@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String SPOTS_URL = "http://andolabo.sakura.ne.jp/arproject/show_spot.php";
     private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
-    private static int spots_length = 0;
+    private static int spots_length = 20;
 
     //private JSONObject json = null;
     private TestTask testTask;
@@ -50,9 +50,11 @@ public class MainActivity extends AppCompatActivity {
         //initDB();
         context = getApplicationContext();
         getSpots();
+/*
         for(int index = 0; index < spots_length; index++){
             getPosts(index);
         }
+*/
 
 
         //System.out.println("test");
@@ -187,16 +189,16 @@ public class MainActivity extends AppCompatActivity {
         String spots_id = null;
         try{
             JSONObject json = new JSONObject(result);
-            spots_id = json.getString("spots_id");
+            spots_id = json.getJSONObject("Post_all").getJSONObject("posts").getJSONObject(valueOf(1)).getString("posts_spots_id");
         } catch (JSONException e) {
             e.printStackTrace();
             return;
         }
 
         //debug
-        Toast.makeText(context, "メモリーフロートDB(" +
+/*        Toast.makeText(context, "メモリーフロートDB(" +
                 "スポットID:" + spots_id +
-                "作成開始", Toast.LENGTH_SHORT).show();
+                "作成開始", Toast.LENGTH_SHORT).show();*/
 
         //データ取得処理
         JSONObject posts = null;
@@ -238,9 +240,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //debug
-        Toast.makeText(context, "メモリーフロートDB(" +
+/*        Toast.makeText(context, "メモリーフロートDB(" +
                 "スポットID:" + spots_id +
-                "作成終了", Toast.LENGTH_SHORT).show();
+                "作成終了", Toast.LENGTH_SHORT).show();*/
         checkDBPosts();
     }
 
@@ -296,6 +298,11 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
 
+
+        for(int index = 1; index <= spots_length; index++){
+            getPosts(index);
+        }
+
         //Toast.makeText(context, "DBチェック終了", Toast.LENGTH_SHORT).show();
     }
 
@@ -324,8 +331,8 @@ public class MainActivity extends AppCompatActivity {
                 PostsTable.COL_IMAGES_BIN
         };
 
-        String selection = PostsTable.COL_ID + " = ?"; // WHERE 句
-        String[] selectionArgs = { "1" };
+        String selection = PostsTable.COL_SPOTS_ID + " = ?"; // WHERE 句
+        String[] selectionArgs = { "10" };
         String sortOrder = PostsTable.COL_ID + " ASC"; // ORDER 句
         Cursor cursor = reader.query(
                 PostsTable.TABLE_NAME, // The table to query
@@ -350,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
             String nickname = cursor.getString(cursor.getColumnIndexOrThrow(PostsTable.COL_NICKNAME));
             //Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
             //System.out.println("id: " + String.valueOf(id) + ", name: " + name);
-            Log.d(TAG, "id: " + String.valueOf(id) + ", nickname: " + nickname);
+            //Log.d(TAG, "id: " + String.valueOf(id) + ", nickname: " + nickname);
         }
         cursor.close();
 

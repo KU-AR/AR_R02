@@ -64,12 +64,12 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
-<!--        <Button
-            android:id="@+id/ButtonArahama"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#00FFFFFF"
-            android:onClick="onButton1" />-->
+        <!--        <Button
+                    android:id="@+id/ButtonArahama"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#00FFFFFF"
+                    android:onClick="onButton1" />-->
 
 
     </RelativeLayout>

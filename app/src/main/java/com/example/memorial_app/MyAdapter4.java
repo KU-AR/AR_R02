@@ -24,13 +24,13 @@ public class MyAdapter4 extends RecyclerView.Adapter<MyAdapter4.ViewHolder> {
 
     //private onItemClickListener listener;
 
-    private List<Integer> iId;
-    private List<String> iNickname;
-    private List<Integer> iAge;
-    private List<String> iJob;
-    private List<String> iMemory;
-    private List<String> iTime;
-    private List<String> iEmotion;
+    private List<Integer> iIds;
+    private List<String> iNicknames;
+    private List<Integer> iAges;
+    private List<String> iJobs;
+    private List<String> iMemories;
+    private List<String> iTimes;
+    private List<String> iEmotions;
     private List<String> iImages;
 
     // Provide a reference to the views for each data item
@@ -53,14 +53,14 @@ public class MyAdapter4 extends RecyclerView.Adapter<MyAdapter4.ViewHolder> {
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    MyAdapter4(List<Integer> itemId, List<String> itemNickNames, List<Integer> itemAge, List<String> itemJob, List<String> itemMemory, List<String> itemTime, List<String> itemEmotion, List<String> itemImages) {
-        this.iId = itemId;
-        this.iNickname = itemNickNames;
-        this.iAge = itemAge;
-        this.iJob = itemJob;
-        this.iMemory = itemMemory;
-        this.iTime = itemTime;
-        this.iEmotion = itemEmotion;
+    MyAdapter4(List<Integer> itemIds, List<String> itemNickNames, List<Integer> itemAges, List<String> itemJobs, List<String> itemMemories, List<String> itemTimes, List<String> itemEmotions, List<String> itemImages) {
+        this.iIds = itemIds;
+        this.iNicknames = itemNickNames;
+        this.iAges = itemAges;
+        this.iJobs = itemJobs;
+        this.iMemories = itemMemories;
+        this.iTimes = itemTimes;
+        this.iEmotions = itemEmotions;
         this.iImages = itemImages;
     }
 
@@ -80,7 +80,7 @@ public class MyAdapter4 extends RecyclerView.Adapter<MyAdapter4.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // create a new view
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.my_text_view3, parent, false);
+                .inflate(R.layout.my_text_view4, parent, false);
 
         // set the view's size, margins, paddings and layout parameters
 
@@ -107,8 +107,8 @@ public class MyAdapter4 extends RecyclerView.Adapter<MyAdapter4.ViewHolder> {
             System.out.println(e);
         }
         holder.imageView.setImageBitmap(bitmapImage);
-        holder.textView.setText(iNickname.get(position));
-        holder.captionView.setText(iMemory.get(position));
+        holder.textView.setText(iNicknames.get(position));
+        holder.captionView.setText(iMemories.get(position));
 /*        holder.imageView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -132,25 +132,25 @@ public class MyAdapter4 extends RecyclerView.Adapter<MyAdapter4.ViewHolder> {
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return iId.size();
+        return iIds.size();
     }
 
     public void refreshAdapter(List<Integer> itemId, List<String> itemNickNames, List<Integer> itemAge, List<String> itemJob, List<String> itemMemory, List<String> itemTime, List<String> itemEmotion, List<String> itemImages){
-        this.iId.clear();
-        this.iNickname.clear();
-        this.iAge.clear();
-        this.iJob.clear();
-        this.iMemory.clear();
-        this.iTime.clear();
-        this.iEmotion.clear();
+        this.iIds.clear();
+        this.iNicknames.clear();
+        this.iAges.clear();
+        this.iJobs.clear();
+        this.iMemories.clear();
+        this.iTimes.clear();
+        this.iEmotions.clear();
         this.iImages.clear();
-        this.iId = itemId;
-        this.iNickname = itemNickNames;
-        this.iAge = itemAge;
-        this.iJob = itemJob;
-        this.iMemory = itemMemory;
-        this.iTime = itemTime;
-        this.iEmotion = itemEmotion;
+        this.iIds = itemId;
+        this.iNicknames = itemNickNames;
+        this.iAges = itemAge;
+        this.iJobs = itemJob;
+        this.iMemories = itemMemory;
+        this.iTimes = itemTime;
+        this.iEmotions = itemEmotion;
         this.iImages = itemImages;
     }
 }

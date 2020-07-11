@@ -55,8 +55,14 @@
         tools:context=".RouteChoiceSpot">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/my_recycler_view4"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+
     </RelativeLayout>
 
     <LinearLayout

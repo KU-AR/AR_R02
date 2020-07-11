@@ -13,10 +13,11 @@ public class MyClass {
     private Float itemLatitudes;
     private Float itemLongitudes;
     private String itemImages;
+    private int itemMemoryFloats;
 
     private Float itemDistances;
 
-    public MyClass(int itemIds, String itemUpdated_at, String itemCreated_at, String itemNames, String itemRubys, String itemCaptions, Float itemLatitudes, Float itemLongitudes, String itemImages, Float itemDistances){
+    public MyClass(int itemIds, String itemUpdated_at, String itemCreated_at, String itemNames, String itemRubys, String itemCaptions, Float itemLatitudes, Float itemLongitudes, String itemImages, Float itemDistances, int itemMemoryFloats){
         this.itemIds = itemIds;
         this.itemUpdated_at = itemUpdated_at;
         this.itemCreated_at = itemCreated_at;
@@ -27,6 +28,7 @@ public class MyClass {
         this.itemLongitudes = itemLongitudes;
         this.itemImages = itemImages;
         this.itemDistances = itemDistances;
+        this.itemMemoryFloats = itemMemoryFloats;
     }
 
     public int getItemIds(){
@@ -59,8 +61,10 @@ public class MyClass {
     public Float getItemDistances(){
         return itemDistances;
     }
+    public int getItemMemoryFloats(){return itemMemoryFloats;}
 
     public void setItemDistances(Float distance) { this.itemDistances = distance; }
+    public void setItemMemoryFloats(int MemoryFloat){ this.itemMemoryFloats = MemoryFloat; }
 }
 
 class RubyComp implements Comparator<MyClass> {
@@ -98,3 +102,16 @@ class UpdateComp implements Comparator<MyClass> {
         return c1.getItemUpdated_at().compareTo(c2.getItemUpdated_at());
     }
 }
+
+class MemoryFloatComp implements Comparator<MyClass> {
+    public int compare(MyClass c1, MyClass c2) {
+        if(c1.getItemMemoryFloats() > c2.getItemMemoryFloats()) {
+            return -1;
+        } else if(c1.getItemMemoryFloats() < c2.getItemMemoryFloats()) {
+            return 1;
+        } else {
+            return c1.getItemRubys().compareTo(c2.getItemRubys());
+        }
+    }
+}
+

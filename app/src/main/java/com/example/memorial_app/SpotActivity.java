@@ -26,9 +26,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+//import static com.example.memorial_app.MyDbContract.SpotsTable;
+import static com.example.memorial_app.MyDbContract.PostsTable;
+
 
 public class SpotActivity extends AppCompatActivity/* implements LocationListener*/{
     private MyDbSpots mDbSpots = null;
+    private MyDbPosts mDbPosts = null;
 
     private Context context = null;
     RecyclerView recyclerView = null;
@@ -38,6 +42,10 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
     private int narrowing_flag = 0;
     //並び替え用フラグ default(登録id順):0  距離順:1  五十音順:2 メモリーフロート数順:3　 更新順:4
     private int sorting_flag = 0;
+
+    //表示テキスト
+    private String narrowing_text = "絞り込みなし";
+    private String sorting_text = "登録順";
 
     //位置情報関連
     final static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 10;
@@ -59,6 +67,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
     static List<Float> itemLongitudes = new ArrayList<Float>();
     static List<String> itemImages = new ArrayList<String>();
     static List<Double> itemDistances = new ArrayList<Double>();
+    static List<Integer> itemMemoryFloats = new ArrayList<Integer>();
 
     static ArrayList<MyClass> items = new ArrayList<>();
     static ArrayList<MyClass> items_copy = new ArrayList<>();
@@ -121,22 +130,27 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         if(narrowing_flag == 0){
             //narrowing_flag = 1 に遷移　1km以内
             narrowing_flag = 1;
+            narrowing_text = "1km以内の見学スポット";
         }
         else if(narrowing_flag == 1){
             //narrowing_flag = 2 に遷移　2km以内
             narrowing_flag = 2;
+            narrowing_text = "2km以内の見学スポット";
         }
         else if(narrowing_flag == 2){
             //narrowing_flag = 3 に遷移　5km以内
             narrowing_flag = 3;
+            narrowing_text = "5km以内の見学スポット";
         }
         else if(narrowing_flag == 3){
             //narrowing_flag = 4 に遷移　10km以内
             narrowing_flag = 4;
+            narrowing_text = "10km以内の見学スポット";
         }
         else{
             //narrowing_flag = 0 に遷移　絞り込みなし
             narrowing_flag = 0;
+            narrowing_text = "絞り込みなし";
         }
         getLastLocation();
         refresh();
@@ -147,22 +161,27 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         if(sorting_flag == 0){
             //sorting_flag = 1 に遷移　距離順
             sorting_flag = 1;
+            sorting_text = "距離順（近い順）";
         }
         else if(sorting_flag == 1){
             //sorting_flag = 2 に遷移　五十音順
             sorting_flag = 2;
+            sorting_text = "五十音順";
         }
         else if(sorting_flag == 2){
             //sorting_flag = 3 に遷移　メモリーフロート数順
             sorting_flag = 3;
+            sorting_text = "メモリーフロート数順（多い順）";
         }
         else if(sorting_flag == 3){
             //sorting_flag = 4 に遷移　更新順
             sorting_flag = 4;
+            sorting_text = "更新順";
         }
         else{
             //sorting_flag = 0 に遷移　id順
             sorting_flag = 0;
+            sorting_text = "登録順";
         }
         getLastLocation();
         refresh();
@@ -209,6 +228,9 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
         //DBからデータ取得　並び替え絞り込み実装前
         createSpot(narrowing_flag, sorting_flag);
+
+        //メモリーフロート数計算
+        countMemoryFloats();
 
 /*
         updateItemList();
@@ -323,8 +345,8 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
             itemLongitudes.add(longitude);
             itemImages.add(image_bin);*/
 
-            //距離計算はonCreateにて
-            items.add(new MyClass(id, updated_at, created_at, name, ruby, description, latitude, longitude, image_bin, (Float)null));
+            //距離計算はonCreateにて,メモリーフロート数も別途計算
+            items.add(new MyClass(id, updated_at, created_at, name, ruby, description, latitude, longitude, image_bin, (Float)null, (int)0));
         }
         cursor.close();
     }
@@ -422,6 +444,63 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         }
     }
 
+    public void countMemoryFloats(){
+        //Toast.makeText(context, "DBチェック開始", Toast.LENGTH_SHORT).show();
+
+        List<Integer> MemoryFloats = new ArrayList<Integer>(items.size());
+
+        //mDbHelper = new MyDbPosts(getApplicationContext());
+        mDbPosts = new MyDbPosts(getApplicationContext());
+        SQLiteDatabase reader = mDbPosts.getReadableDatabase();
+        //SQLiteDatabase writer = mDbHelper.getWritableDatabase();
+
+
+        // SELECT
+        String[] projection = { // SELECT する列
+                PostsTable.COL_SPOTS_ID,
+                "count(*)"
+        };
+
+        String selection = PostsTable.COL_ID + " = ?"; // WHERE 句
+        String[] selectionArgs = {  };
+        String sortOrder = PostsTable.COL_ID + " ASC"; // ORDER 句
+        Cursor cursor = reader.query(
+                PostsTable.TABLE_NAME, // The table to query
+                projection,         // The columns to return
+                null,          // The columns for the WHERE clause
+                null,      // The values for the WHERE clause
+                PostsTable.COL_SPOTS_ID,               // group the rows
+                null,               // don't filter by row groups
+                sortOrder           // The sort order
+        );
+/*        Cursor cursor = reader.query(
+                MyTable.TABLE_NAME, // The table to query
+                projection,         // The columns to return
+                selection,          // The columns for the WHERE clause
+                selectionArgs,      // The values for the WHERE clause
+                null,               // don't group the rows
+                null,               // don't filter by row groups
+                sortOrder           // The sort order
+        );*/
+        while(cursor.moveToNext()) {
+            int spots_id = cursor.getInt(cursor.getColumnIndexOrThrow(PostsTable.COL_SPOTS_ID));
+            int count = cursor.getInt(cursor.getColumnIndexOrThrow("count(*)"));
+            //Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
+            //System.out.println("id: " + String.valueOf(id) + ", name: " + name);
+            Log.d("memoryfloat", "spots_id: " + String.valueOf(spots_id) + ", count: " + count);
+            items.get(spots_id - 1).setItemMemoryFloats(count);
+        }
+
+        cursor.close();
+
+        itemMemoryFloats.clear();
+        for(int index = 0; index < items.size(); index++){
+            itemMemoryFloats.add(items.get(index).getItemMemoryFloats());
+        }
+
+        //Toast.makeText(context, "DBチェック終了", Toast.LENGTH_SHORT).show();
+    }
+
     public void sortItem(int narrowing_flag, int sorting_flag){
         //itemを絞り込み、並び替え
         //latitude1°は110.9463km     仙台駅　　（緯度：38.26°、緯度： 140.88°）　経度 1°の距離： 87.4082Km
@@ -441,6 +520,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 break;
             case 3:
                 //メモリーフロート数取得後に実装
+                Collections.sort(items_copy, new MemoryFloatComp());
                 break;
             case 4:
                 Collections.sort(items_copy, new UpdateComp());
@@ -488,7 +568,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         }
         items_copy.clear();
         items_copy = (ArrayList<MyClass>) temp.clone();
-        Toast.makeText(context, "絞り込み：" + String.valueOf(narrowing_flag) + "並び替え：" + String.valueOf(sorting_flag), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "絞り込み：" + narrowing_text + "\n" + "並び替え：" + sorting_text, Toast.LENGTH_LONG).show();
     }
 
     private void getLastLocation(){
