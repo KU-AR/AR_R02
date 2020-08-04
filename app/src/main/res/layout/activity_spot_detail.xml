@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="false"
         android:background="#70FFFFFF"
-        android:text="立石知己 - 投稿者自身による作品, CC 表示-継承 4.0, https://commons.wikimedia.org/w/index.php?curid=58434355による"
+        android:text=""
         android:textAlignment="textEnd"
         android:textColor="#80000000"
         android:textSize="7sp" />

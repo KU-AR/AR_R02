@@ -201,7 +201,7 @@
                 android:paddingStart="15dp"
                 android:textSize="18sp" />
 
-            <EditText
+<!--            <EditText
                 android:id="@+id/Picture"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -212,7 +212,29 @@
                 android:hint="@string/picture"
                 android:inputType="textPersonName"
                 android:paddingStart="15dp"
-                android:textSize="18sp" />
+                android:textSize="18sp" />-->
+            <Button
+                android:id="@+id/Picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/colorMain"
+                android:onClick="selectPicture"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:text="@string/picture"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/ConfirmationButton"

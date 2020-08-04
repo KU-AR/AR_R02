@@ -165,7 +165,9 @@ public class MemoryFloatMainActivity extends AppCompatActivity {
     public void onButtonPost(View v) {
         // 画面指定
         Intent intent = new Intent(this,MemoryFloatPostActivity.class);
+        intent.putExtra("id", id);
         // 画面を開く
         startActivity(intent);
+
     }
 }
