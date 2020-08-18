@@ -54,6 +54,7 @@
     <string name="memory">*メモリー</string>
     <string name="time_series">*時系列</string>
     <string name="picture">写真</string>
+    <string name="picture_selected">写真選択済み</string>
     <string name="emotion">*感情</string>
 
     <string name="check_message">入力内容を確認してください</string>

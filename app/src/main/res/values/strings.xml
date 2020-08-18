@@ -54,6 +54,7 @@
     <string name="memory">*Memory</string>
     <string name="time_series">*Time series</string>
     <string name="picture">Picture</string>
+    <string name="picture_selected">Picture Selected</string>
     <string name="emotion">*Emotion</string>
 
     <string name="check_message">Please check your entries.</string>
