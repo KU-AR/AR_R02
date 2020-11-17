@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String SPOTS_URL = "http://andolabo.sakura.ne.jp/arproject/show_spot.php";
     private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
-    private static int spots_length = 20;
+    public static int spots_length = 20;
 
     //private JSONObject json = null;
     private TestTask testTask;

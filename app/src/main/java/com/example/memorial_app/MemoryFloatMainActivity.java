@@ -4,20 +4,35 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.String.valueOf;
 
 public class MemoryFloatMainActivity extends AppCompatActivity {
     private MyDbPosts mDbPosts = null;
     MyAdapter4 rAdapter = null;
     RecyclerView recyclerView = null;
     static int id = 999;
+
+    private Context context = null;
+
+    private TestTask testTask;
+    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
+
 
     static List<Integer> itemIds = new ArrayList<Integer>();
     static List<Integer> itemSpots_Ids = new ArrayList<Integer>();
@@ -41,7 +56,7 @@ public class MemoryFloatMainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         id = intent.getIntExtra("id", 999);
 
-        createPost(id);
+        getMemoryFloat(id);
 
         recyclerView = findViewById(R.id.my_recycler_view4);
 
@@ -69,7 +84,27 @@ public class MemoryFloatMainActivity extends AppCompatActivity {
 
     }
 
-    public void createPost(int spots_id){
+    public void getMemoryFloat(int id){
+        final String json_input = "{\"spots_id\":\"" + id + "\"}";
+        testTask = new TestTask(this);
+        testTask.setListener(createListener());
+        testTask.execute(POSTS_URL, json_input);
+        Toast.makeText(context, "メモリーフロート取得開始", Toast.LENGTH_SHORT).show();
+    }
+
+    private TestTask.Listener createListener(){
+        return new TestTask.Listener() {
+            @Override
+            public void onSuccess(String strPostURL, String json_input, String result) {
+                if(strPostURL == POSTS_URL){
+                    //json_string = result;
+                    createPost(result);
+                }
+            }
+        };
+    }
+
+    public void createPost(String result){
 
         itemIds.clear();
         itemSpots_Ids.clear();
@@ -84,82 +119,48 @@ public class MemoryFloatMainActivity extends AppCompatActivity {
         itemEmotions.clear();
         itemImages.clear();
 
-        mDbPosts = new MyDbPosts(getApplicationContext());
-        SQLiteDatabase reader = mDbPosts.getReadableDatabase();
-        //SQLiteDatabase writer = mDbHelper.getWritableDatabase();
+        //スポットID取得
+        int spots_id = id;
 
-        // SELECT
-        String[] projection = { // SELECT する列
-                MyDbContract.PostsTable.COL_ID,
-                MyDbContract.PostsTable.COL_SPOTS_ID,
-                MyDbContract.PostsTable.COL_UPDATED_AT,
-                MyDbContract.PostsTable.COL_NICKNAME,
-                MyDbContract.PostsTable.COL_PAST_ADDRESS,
-                MyDbContract.PostsTable.COL_CURRENT_ADDRESS,
-                MyDbContract.PostsTable.COL_AGE,
-                MyDbContract.PostsTable.COL_JOB,
-                MyDbContract.PostsTable.COL_MEMORY,
-                MyDbContract.PostsTable.COL_TIME,
-                MyDbContract.PostsTable.COL_EMOTION,
-                MyDbContract.PostsTable.COL_IMAGES_BIN
-        };
-
-
-        String selection = MyDbContract.PostsTable.COL_SPOTS_ID + " = ?"; // WHERE 句
-        String[] selectionArgs = { String.valueOf(spots_id) };
-
-
-        String sortOrder = MyDbContract.PostsTable.COL_ID + " ASC"; // ORDER 句
-        Cursor cursor = reader.query(
-                MyDbContract.PostsTable.TABLE_NAME, // The table to query
-                projection,         // The columns to return
-                selection,          // The columns for the WHERE clause
-                selectionArgs,      // The values for the WHERE clause
-                null,               // don't group the rows
-                null,               // don't filter by row groups
-                sortOrder           // The sort order
-        );
-/*        Cursor cursor = reader.query(
-                MyTable.TABLE_NAME, // The table to query
-                projection,         // The columns to return
-                selection,          // The columns for the WHERE clause
-                selectionArgs,      // The values for the WHERE clause
-                null,               // don't group the rows
-                null,               // don't filter by row groups
-                sortOrder           // The sort order
-        );*/
-
-        while(cursor.moveToNext()) {
-            Integer id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_ID));
-            Integer s_id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_SPOTS_ID));
-            String updated_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_UPDATED_AT));
-            String nickname = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_NICKNAME));
-            String past_address = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_PAST_ADDRESS));
-            String current_address = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_CURRENT_ADDRESS));
-            Integer age = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_AGE));
-            String job = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_JOB));
-            String memory = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_MEMORY));
-            String time = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_TIME));
-            String emotion = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_EMOTION));
-            String image_bin = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.PostsTable.COL_IMAGES_BIN));
-
-            itemIds.add(id);
-            itemSpots_Ids.add(s_id);
-            itemUpdated_Ats.add(updated_at);
-            itemNickNames.add(nickname);
-            itemPast_Addresses.add(past_address);
-            itemCurrent_Addresses.add(current_address);
-            itemAges.add(age);
-            itemJobs.add(job);
-            itemMemories.add(memory);
-            itemTimes.add(time);
-            itemEmotions.add(emotion);
-            itemImages.add(image_bin);
-
-            //距離計算はonCreateにて
-            //items.add(new MyClass(id, updated_at, created_at, name, ruby, description, latitude, longitude, image_bin, (Float)null));
+        //データ取得処理
+        JSONObject posts = null;
+        try{
+            JSONObject json = new JSONObject(result);
+            posts = json.getJSONObject("Post_all").getJSONObject("posts");
         }
-        cursor.close();
+        catch(JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // INSERT
+        int posts_length = posts.length();
+        for(int i = 0; i < posts_length; i++){
+            try {
+                JSONObject post = posts.getJSONObject(valueOf(i+1));
+                itemIds.add(Integer.parseInt(post.getString("posts_id")));
+                itemSpots_Ids.add(spots_id);
+                itemUpdated_Ats.add(post.getString("posts_updated_at"));
+                itemNickNames.add(post.getString("posts_nickname"));
+                itemPast_Addresses.add(post.getString("posts_past_address"));
+                itemCurrent_Addresses.add(post.getString("posts_current_address"));
+                itemAges.add(Integer.parseInt(post.getString("posts_age")));
+                itemJobs.add(post.getString("posts_job"));
+                itemMemories.add(post.getString("posts_memory"));
+                itemTimes.add(post.getString("posts_time"));
+                itemEmotions.add(post.getString("posts_emotion"));
+                itemImages.add(post.getString("posts_images_bin"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        refresh();
+    }
+
+    private void refresh() {
+        rAdapter = new MyAdapter4(itemIds, itemNickNames, itemAges, itemJobs, itemMemories, itemTimes, itemEmotions, itemImages);
+        recyclerView.setAdapter(rAdapter);
     }
 
     public void onButtonPost(View v) {

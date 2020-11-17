@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,15 +23,23 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 //import static com.example.memorial_app.MyDbContract.SpotsTable;
+import static com.example.memorial_app.MainActivity.spots_length;
 import static com.example.memorial_app.MyDbContract.PostsTable;
+import static java.lang.String.valueOf;
 
 
 public class SpotActivity extends AppCompatActivity/* implements LocationListener*/{
+    private TestTask testTask;
+    private static final String COUNT_URL = "http://andolabo.sakura.ne.jp/arproject/count_memory.php";
+
     private MyDbSpots mDbSpots = null;
     private MyDbPosts mDbPosts = null;
 
@@ -230,7 +239,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         createSpot(narrowing_flag, sorting_flag);
 
         //メモリーフロート数計算
-        countMemoryFloats();
+        //countMemoryFloats();
 
 /*
         updateItemList();
@@ -444,7 +453,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         }
     }
 
-    public void countMemoryFloats(){
+/*    public void countMemoryFloats(){
         //Toast.makeText(context, "DBチェック開始", Toast.LENGTH_SHORT).show();
 
         List<Integer> MemoryFloats = new ArrayList<Integer>(items.size());
@@ -473,7 +482,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 null,               // don't filter by row groups
                 sortOrder           // The sort order
         );
-/*        Cursor cursor = reader.query(
+*//*        Cursor cursor = reader.query(
                 MyTable.TABLE_NAME, // The table to query
                 projection,         // The columns to return
                 selection,          // The columns for the WHERE clause
@@ -481,7 +490,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 null,               // don't group the rows
                 null,               // don't filter by row groups
                 sortOrder           // The sort order
-        );*/
+        );*//*
         while(cursor.moveToNext()) {
             int spots_id = cursor.getInt(cursor.getColumnIndexOrThrow(PostsTable.COL_SPOTS_ID));
             int count = cursor.getInt(cursor.getColumnIndexOrThrow("count(*)"));
@@ -499,7 +508,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         }
 
         //Toast.makeText(context, "DBチェック終了", Toast.LENGTH_SHORT).show();
-    }
+    }*/
 
     public void sortItem(int narrowing_flag, int sorting_flag){
         //itemを絞り込み、並び替え
@@ -519,7 +528,8 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 Collections.sort(items_copy, new RubyComp());
                 break;
             case 3:
-                //メモリーフロート数取得後に実装
+                //メモリーフロート数取得
+                getCount();
                 Collections.sort(items_copy, new MemoryFloatComp());
                 break;
             case 4:
@@ -569,6 +579,60 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         items_copy.clear();
         items_copy = (ArrayList<MyClass>) temp.clone();
         Toast.makeText(context, "絞り込み：" + narrowing_text + "\n" + "並び替え：" + sorting_text, Toast.LENGTH_LONG).show();
+    }
+
+    public void getCount(){
+        final String json_input = "{\"test\":\"abc\"}";
+        testTask = new TestTask(this);
+        testTask.setListener(createListener());
+        testTask.execute(COUNT_URL, json_input);
+        Toast.makeText(context, "メモリー数取得開始", Toast.LENGTH_SHORT).show();
+
+    }
+
+    private TestTask.Listener createListener(){
+        return new TestTask.Listener() {
+            @Override
+            public void onSuccess(String strPostURL, String json_input, String result) {
+                if(strPostURL == COUNT_URL){
+                    //json_string = result;
+                    setCount(result);
+                }
+            }
+        };
+    }
+
+    private void setCount(String result){
+        JSONObject counts = null;
+        try{
+            JSONObject json = new JSONObject(result);
+            counts = json.getJSONObject("memory").getJSONObject("counts");
+        }
+        catch(JSONException e) {
+            return;
+        }
+        int counts_length;
+        counts_length = counts.length();
+        itemMemoryFloats.clear();
+        int j = 0;
+        for(int i = 0; i < spots_length; i++){
+            try {
+                    JSONObject count = counts.getJSONObject(valueOf(j+1));
+                    if(i == Integer.parseInt(count.getString("posts_spots_id")) - 1){
+                        items.get(i).setItemMemoryFloats(Integer.parseInt(count.getString("count")));
+                        itemMemoryFloats.add(Integer.parseInt(count.getString("count")));
+                        if(j < counts_length - 1){
+                            j++;
+                        }
+                    }
+                    else{
+                        items.get(i).setItemMemoryFloats(0);
+                        itemMemoryFloats.add(0);
+                    }
+                }catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void getLastLocation(){
