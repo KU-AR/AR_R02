@@ -2,12 +2,15 @@ package com.example.memorial_app;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.GeomagneticField;
@@ -36,7 +39,7 @@ import static com.example.memorial_app.MyDbContract.PostsTable;
 import static java.lang.String.valueOf;
 
 
-public class SpotActivity extends AppCompatActivity/* implements LocationListener*/{
+public class SpotActivity extends AppCompatActivity/* implements LocationListener*/ {
     private TestTask testTask;
     private static final String COUNT_URL = "http://andolabo.sakura.ne.jp/arproject/count_memory.php";
 
@@ -58,7 +61,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
     //位置情報関連
     final static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 10;
-//    private LocationManager locationManager;
+    //    private LocationManager locationManager;
     private GeomagneticField geomagneticField;
     private static double latitude = 0;
     private static double longitude = 0;
@@ -134,29 +137,25 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 */
 
 
-    public void onButton2(View v){
+    public void onButton2(View v) {
         //絞り込み
-        if(narrowing_flag == 0){
+        if (narrowing_flag == 0) {
             //narrowing_flag = 1 に遷移　1km以内
             narrowing_flag = 1;
             narrowing_text = "1km以内の見学スポット";
-        }
-        else if(narrowing_flag == 1){
+        } else if (narrowing_flag == 1) {
             //narrowing_flag = 2 に遷移　2km以内
             narrowing_flag = 2;
             narrowing_text = "2km以内の見学スポット";
-        }
-        else if(narrowing_flag == 2){
+        } else if (narrowing_flag == 2) {
             //narrowing_flag = 3 に遷移　5km以内
             narrowing_flag = 3;
             narrowing_text = "5km以内の見学スポット";
-        }
-        else if(narrowing_flag == 3){
+        } else if (narrowing_flag == 3) {
             //narrowing_flag = 4 に遷移　10km以内
             narrowing_flag = 4;
             narrowing_text = "10km以内の見学スポット";
-        }
-        else{
+        } else {
             //narrowing_flag = 0 に遷移　絞り込みなし
             narrowing_flag = 0;
             narrowing_text = "絞り込みなし";
@@ -165,29 +164,25 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         refresh();
     }
 
-    public void onButton3(View v){
+    public void onButton3(View v) {
         //並び替え
-        if(sorting_flag == 0){
+        if (sorting_flag == 0) {
             //sorting_flag = 1 に遷移　距離順
             sorting_flag = 1;
             sorting_text = "距離順（近い順）";
-        }
-        else if(sorting_flag == 1){
+        } else if (sorting_flag == 1) {
             //sorting_flag = 2 に遷移　五十音順
             sorting_flag = 2;
             sorting_text = "五十音順";
-        }
-        else if(sorting_flag == 2){
+        } else if (sorting_flag == 2) {
             //sorting_flag = 3 に遷移　メモリーフロート数順
             sorting_flag = 3;
             sorting_text = "メモリーフロート数順（多い順）";
-        }
-        else if(sorting_flag == 3){
+        } else if (sorting_flag == 3) {
             //sorting_flag = 4 に遷移　更新順
             sorting_flag = 4;
             sorting_text = "更新順";
-        }
-        else{
+        } else {
             //sorting_flag = 0 に遷移　id順
             sorting_flag = 0;
             sorting_text = "登録順";
@@ -207,13 +202,13 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         updateItemList();
 
         //debug
-        Log.d("debug",itemIds.toString());
+        Log.d("debug", itemIds.toString());
 
         rAdapter = new MyAdapter3(itemIds, itemNames, itemCaptions, itemLatitudes, itemLongitudes, itemImages);
         recyclerView.setAdapter(rAdapter);
-        rAdapter.setOnItemClickListener(new MyAdapter3.onItemClickListener(){
+        rAdapter.setOnItemClickListener(new MyAdapter3.onItemClickListener() {
             @Override
-            public void onClick(View view, int id){
+            public void onClick(View view, int id) {
                 //Toast.makeText(SpotActivity.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(SpotActivity.this, SpotDetailActivity.class);
                 intent.putExtra("id", id);
@@ -284,7 +279,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         finish();
     }
 
-    public void createSpot(int narrowing_flag, int sorting_flag){
+    public void createSpot(int narrowing_flag, int sorting_flag) {
 /*        itemIds.clear();
         itemNames.clear();
         itemRubys.clear();
@@ -336,7 +331,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 null,               // don't filter by row groups
                 sortOrder           // The sort order
         );*/
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             Integer id = cursor.getInt(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_ID));
             String updated_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_UPDATED_AT));
             String created_at = cursor.getString(cursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_CREATED_AT));
@@ -355,16 +350,16 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
             itemImages.add(image_bin);*/
 
             //距離計算はonCreateにて,メモリーフロート数も別途計算
-            items.add(new MyClass(id, updated_at, created_at, name, ruby, description, latitude, longitude, image_bin, (Float)null, (int)0));
+            items.add(new MyClass(id, updated_at, created_at, name, ruby, description, latitude, longitude, image_bin, (Float) null, (int) 0));
         }
         cursor.close();
     }
 
     //itemListの更新、距離の計算
-    public void updateItemList(){
+    public void updateItemList() {
         //極半径、赤道半径(km)
         double pole_radius = 6356.752;
-        double equatorial_radius =6378.137;
+        double equatorial_radius = 6378.137;
 
         //緯度1度の距離
         double lat = pole_radius * 2 * Math.PI / 360;
@@ -417,7 +412,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 ;
             }
         }*/
-        for(int index = 0; index < items_copy.size(); index++){
+        for (int index = 0; index < items_copy.size(); index++) {
             itemIds.add(items_copy.get(index).getItemIds());
             itemUpdated_at.add(items_copy.get(index).getItemUpdated_at());
             itemCreated_at.add(items_copy.get(index).getItemCreated_at());
@@ -429,7 +424,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
             itemImages.add(items_copy.get(index).getItemImages());
 
             //距離計算
-            if(latitude != 0 && longitude != 0){
+            if (latitude != 0 && longitude != 0) {
 /*                double x1 = latitude*1000000;
                 double y1 = longitude*1000000;
                 double x2 = items_copy.get(index).getItemLatitudes()*1000000;
@@ -438,15 +433,14 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
                 double y1 = longitude;
                 double x2 = items_copy.get(index).getItemLatitudes();
                 double y2 = items_copy.get(index).getItemLongitudes();
-                double lat_dis = Math.abs(x1-x2) * lat;
-                double lon_dis = Math.abs(y1-y2) * lon;
+                double lat_dis = Math.abs(x1 - x2) * lat;
+                double lon_dis = Math.abs(y1 - y2) * lon;
                 double distance = Math.sqrt(Math.pow(lat_dis, 2) + Math.pow(lon_dis, 2));
                 itemDistances.add(distance);
                 //itemへのsetでうまくいくか未確認
                 items_copy.get(index).setItemDistances((float) distance);
                 Log.d("Distance Debug: ", String.valueOf(distance));
-            }
-            else{
+            } else {
                 //現在地取得できていない
                 ;
             }
@@ -510,14 +504,14 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         //Toast.makeText(context, "DBチェック終了", Toast.LENGTH_SHORT).show();
     }*/
 
-    public void sortItem(int narrowing_flag, int sorting_flag){
+    public void sortItem(int narrowing_flag, int sorting_flag) {
         //itemを絞り込み、並び替え
         //latitude1°は110.9463km     仙台駅　　（緯度：38.26°、緯度： 140.88°）　経度 1°の距離： 87.4082Km
 
         ArrayList<MyClass> temp = new ArrayList<>();
 
         //並び替え用フラグ default(登録id順):0  距離順:1  五十音順:2 メモリーフロート数順:3　 更新順:4
-        switch(sorting_flag){
+        switch (sorting_flag) {
             case 0:
                 Collections.sort(items_copy, new IdComp());
                 break;
@@ -537,41 +531,41 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         }
 
         //絞り込み用フラグ default(絞り込みなし):0  1km以内:1  2km以内:2  5km以内:3 10km以内:4
-        switch(narrowing_flag){
+        switch (narrowing_flag) {
             case 0:
-                for(MyClass item : items_copy){
+                for (MyClass item : items_copy) {
                     Log.d("debug", "distance:" + item.getItemDistances().toString());
-                        temp.add(item);
+                    temp.add(item);
                 }
                 break;
             case 1:
-                for(MyClass item : items_copy){
+                for (MyClass item : items_copy) {
                     Log.d("debug", "distance:" + item.getItemDistances().toString());
-                    if(item.getItemDistances() < 1){
+                    if (item.getItemDistances() < 1) {
                         temp.add(item);
                     }
                 }
                 break;
             case 2:
-                for(MyClass item : items_copy){
+                for (MyClass item : items_copy) {
                     Log.d("debug", "distance:" + item.getItemDistances().toString());
-                    if(item.getItemDistances() < 2){
+                    if (item.getItemDistances() < 2) {
                         temp.add(item);
                     }
                 }
                 break;
             case 3:
-                for(MyClass item : items_copy){
+                for (MyClass item : items_copy) {
                     Log.d("debug", "distance:" + item.getItemDistances().toString());
-                    if(item.getItemDistances() < 5){
+                    if (item.getItemDistances() < 5) {
                         temp.add(item);
                     }
                 }
                 break;
             case 4:
-                for(MyClass item : items_copy){
+                for (MyClass item : items_copy) {
                     Log.d("debug", "distance:" + item.getItemDistances().toString());
-                    if(item.getItemDistances() < 10){
+                    if (item.getItemDistances() < 10) {
                         temp.add(item);
                     }
                 }
@@ -581,7 +575,7 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         Toast.makeText(context, "絞り込み：" + narrowing_text + "\n" + "並び替え：" + sorting_text, Toast.LENGTH_LONG).show();
     }
 
-    public void getCount(){
+    public void getCount() {
         final String json_input = "{\"test\":\"abc\"}";
         testTask = new TestTask(this);
         testTask.setListener(createListener());
@@ -590,11 +584,11 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
 
     }
 
-    private TestTask.Listener createListener(){
+    private TestTask.Listener createListener() {
         return new TestTask.Listener() {
             @Override
             public void onSuccess(String strPostURL, String json_input, String result) {
-                if(strPostURL == COUNT_URL){
+                if (strPostURL == COUNT_URL) {
                     //json_string = result;
                     setCount(result);
                 }
@@ -602,47 +596,56 @@ public class SpotActivity extends AppCompatActivity/* implements LocationListene
         };
     }
 
-    private void setCount(String result){
+    private void setCount(String result) {
         JSONObject counts = null;
-        try{
+        try {
             JSONObject json = new JSONObject(result);
             counts = json.getJSONObject("memory").getJSONObject("counts");
-        }
-        catch(JSONException e) {
+        } catch (JSONException e) {
             return;
         }
         int counts_length;
         counts_length = counts.length();
         itemMemoryFloats.clear();
         int j = 0;
-        for(int i = 0; i < spots_length; i++){
+        for (int i = 0; i < spots_length; i++) {
             try {
-                    JSONObject count = counts.getJSONObject(valueOf(j+1));
-                    if(i == Integer.parseInt(count.getString("posts_spots_id")) - 1){
-                        items.get(i).setItemMemoryFloats(Integer.parseInt(count.getString("count")));
-                        itemMemoryFloats.add(Integer.parseInt(count.getString("count")));
-                        if(j < counts_length - 1){
-                            j++;
-                        }
+                JSONObject count = counts.getJSONObject(valueOf(j + 1));
+                if (i == Integer.parseInt(count.getString("posts_spots_id")) - 1) {
+                    items.get(i).setItemMemoryFloats(Integer.parseInt(count.getString("count")));
+                    itemMemoryFloats.add(Integer.parseInt(count.getString("count")));
+                    if (j < counts_length - 1) {
+                        j++;
                     }
-                    else{
-                        items.get(i).setItemMemoryFloats(0);
-                        itemMemoryFloats.add(0);
-                    }
-                }catch (JSONException e) {
+                } else {
+                    items.get(i).setItemMemoryFloats(0);
+                    itemMemoryFloats.add(0);
+                }
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void getLastLocation(){
+    private void getLastLocation() {
+        //11/18 追記
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         fusedLocationClient.getLastLocation()
                 .addOnCompleteListener(
                         this,
                         new OnCompleteListener<Location>() {
                             @Override
                             public void onComplete(@NonNull Task<Location> task) {
-                                if(task.isSuccessful() && task.getResult() != null){
+                                if (task.isSuccessful() && task.getResult() != null) {
                                     location = task.getResult();
                                     latitude = location.getLatitude();
                                     longitude = location.getLongitude();
