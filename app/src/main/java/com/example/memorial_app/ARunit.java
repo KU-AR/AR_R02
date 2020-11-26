@@ -3,6 +3,7 @@ package com.example.memorial_app;
 //ARの表示を行う
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,28 +26,45 @@ public class ARunit extends View{
     private int dis;
     private ArrayList<ARData> list;
 
-    public ARunit(Context context, Cursor cursor) {
+    private MyDbSpots mDbSpots = null;
+
+    public ARunit(Context context, int id) {
         super(context);
 
-        MakeTable(cursor);
+        MakeTable(id);
         Display DX = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         dis = DX.getWidth();
     }
 
-    public void MakeTable(Cursor cursor) {
+    public void MakeTable(int id) {
 
-        if (list != null)
-            list.clear();
-        list = new ArrayList<ARData>();
+       // mDbSpots = new MyDbSpots(getApplicationContext());
+        SQLiteDatabase reader = mDbSpots.getReadableDatabase();
 
-        cursor.moveToFirst();
-        do {
-            ARData data = new ARData();
-            data.info = cursor.getString(0);
-            data.latitude = cursor.getInt(1);
-            data.longitude = cursor.getInt(2);
-            list.add(data);
-        } while (cursor.moveToNext());
+        // SELECT
+        String[] projection = { // SELECT する列
+                MyDbContract.SpotsTable.COL_NAME,
+                MyDbContract.SpotsTable.COL_LATITUDE,
+                MyDbContract.SpotsTable.COL_LONGITUDE
+        };
+
+        String sortOrder = MyDbContract.SpotsTable.COL_ID + " ASC"; // ORDER 句
+        Cursor dbcursor = reader.query(
+                MyDbContract.SpotsTable.TABLE_NAME, // The table to query
+                projection,         // The columns to return
+                null,          // The columns for the WHERE clause
+                null,      // The values for the WHERE clause
+                null,               // don't group the rows
+                null,               // don't filter by row groups
+                sortOrder           // The sort order
+        );
+        while (dbcursor.moveToNext()) {
+            String name = dbcursor.getString(dbcursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_NAME));
+            Float latitude = dbcursor.getFloat(dbcursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_LATITUDE));
+            Float longitude = dbcursor.getFloat(dbcursor.getColumnIndexOrThrow(MyDbContract.SpotsTable.COL_LONGITUDE));
+
+        }
+        dbcursor.close();
     }
 
     class ARData {
