@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
+        android:layout_width="320dp"
+        android:layout_height="180dp"
+        android:layout_gravity="right"
+        android:layout_marginVertical="250dp"
         android:id="@+id/fukidashi_blue"
         android:src="@drawable/fukidashi_blue"
         />
 
     <TextView
-        android:layout_centerInParent="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:gravity="center"
         android:id="@+id/memoryfloat_blue"
-        android:text="blue test"
-        />
-</RelativeLayout>
+        android:layout_width="320dp"
+        android:layout_height="180dp"
+        android:layout_gravity="right"
+        android:layout_marginVertical="240dp"
+        android:gravity="center"
+        android:text="blue test" />
+</FrameLayout>

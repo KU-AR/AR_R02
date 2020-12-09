@@ -94,8 +94,12 @@ public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCall
 
         setContentView(camera);
         LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.activity_spot_ar, null);
-        addContentView(view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
+        View pink_view = inflater.inflate(R.layout.activity_spot_ar_pink, null);
+        View blue_view = inflater.inflate(R.layout.activity_spot_ar_blue, null);
+        View green_view = inflater.inflate(R.layout.activity_spot_ar_green, null);
+        addContentView(pink_view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
+        addContentView(blue_view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
+        addContentView(green_view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
         //addContentView();
 
         AlphaAnimation aa = new AlphaAnimation(0, 1);
