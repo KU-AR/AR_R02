@@ -31,7 +31,7 @@ public class MemoryFloatMainActivity extends AppCompatActivity {
     private Context context = null;
 
     private TestTask testTask;
-    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_random_memory.php";
+    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
 
 
     static List<Integer> itemIds = new ArrayList<Integer>();
