@@ -36,8 +36,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.List;
+
+import static java.lang.String.valueOf;
 
 public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCallback, SensorEventListener, LocationListener, View.OnClickListener*/ {
 
@@ -74,8 +79,10 @@ public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCall
     private View blue_view;
     private View green_view;
 
+    Context context = null;
+
     private TestTask testTask;
-    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
+    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_random_memory.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,13 +136,52 @@ public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCall
             public void onSuccess(String strPostURL, String json_input, String result) {
                 if(strPostURL == POSTS_URL){
                     //json_string = result;
-                    createPost(result);
+                    //表示
+                    showMemory(result);
                 }
             }
         };
     }
 
-    public void showMemory(){
+    public void showMemory(String result){
+
+        //データ取得処理
+        JSONObject posts = null;
+        try{
+            JSONObject json = new JSONObject(result);
+            posts = json.getJSONObject("Post_all").getJSONObject("posts");
+        }
+        catch(JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // INSERT
+        int posts_length = posts.length();
+        if(posts_length == 0){
+            return;
+        }
+        for(int i = 0; i < posts_length; i++){
+            try {
+                JSONObject post = posts.getJSONObject(valueOf(i+1));
+
+                
+                itemIds.add(Integer.parseInt(post.getString("posts_id")));
+                itemSpots_Ids.add(spots_id);
+                itemUpdated_Ats.add(post.getString("posts_updated_at"));
+                itemNickNames.add(post.getString("posts_nickname"));
+                itemPast_Addresses.add(post.getString("posts_past_address"));
+                itemCurrent_Addresses.add(post.getString("posts_current_address"));
+                itemAges.add(Integer.parseInt(post.getString("posts_age")));
+                itemJobs.add(post.getString("posts_job"));
+                itemMemories.add(post.getString("posts_memory"));
+                itemTimes.add(post.getString("posts_time"));
+                itemEmotions.add(post.getString("posts_emotion"));
+                itemImages.add(post.getString("posts_images_bin"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
