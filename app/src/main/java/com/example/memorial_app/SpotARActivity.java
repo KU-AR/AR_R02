@@ -164,8 +164,10 @@ public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCall
         for(int i = 0; i < posts_length; i++){
             try {
                 JSONObject post = posts.getJSONObject(valueOf(i+1));
+                if(i == 0){
 
-                
+                }
+
                 itemIds.add(Integer.parseInt(post.getString("posts_id")));
                 itemSpots_Ids.add(spots_id);
                 itemUpdated_Ats.add(post.getString("posts_updated_at"));
