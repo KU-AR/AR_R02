@@ -70,6 +70,13 @@ public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCall
 
     static int id = 999;
 
+    private View pink_view;
+    private View blue_view;
+    private View green_view;
+
+    private TestTask testTask;
+    private static final String POSTS_URL = "http://andolabo.sakura.ne.jp/arproject/get_memory.php";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,30 +101,44 @@ public class SpotARActivity extends FragmentActivity /*implements OnMapReadyCall
 
         setContentView(camera);
         LayoutInflater inflater = LayoutInflater.from(this);
-        View pink_view = inflater.inflate(R.layout.activity_spot_ar_pink, null);
-        View blue_view = inflater.inflate(R.layout.activity_spot_ar_blue, null);
-        View green_view = inflater.inflate(R.layout.activity_spot_ar_green, null);
+        pink_view = inflater.inflate(R.layout.activity_spot_ar_pink, null);
+        blue_view = inflater.inflate(R.layout.activity_spot_ar_blue, null);
+        green_view = inflater.inflate(R.layout.activity_spot_ar_green, null);
+        pink_view.setAlpha(0);
+        blue_view.setAlpha(0);
+        green_view.setAlpha(0);
         addContentView(pink_view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
         addContentView(blue_view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
         addContentView(green_view, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
         //addContentView();
-
-        AlphaAnimation aa = new AlphaAnimation(0, 1);
-        aa.setDuration(5000);
-        view.startAnimation(aa);
+        getRandomMemory();
     }
 
-/*    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+    public void getRandomMemory(){
+        //ランダムなメモリーフロート取得
+        final String json_input = "{\"spots_id\":\"" + id + "\"}";
+        testTask = new TestTask(this);
+        testTask.setListener(createListener());
+        testTask.execute(POSTS_URL, json_input);
+        Toast.makeText(context, "メモリーフロート取得開始", Toast.LENGTH_SHORT).show();
+    }
 
-        *//*
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        *//*
-    }*/
+    private TestTask.Listener createListener(){
+        return new TestTask.Listener() {
+            @Override
+            public void onSuccess(String strPostURL, String json_input, String result) {
+                if(strPostURL == POSTS_URL){
+                    //json_string = result;
+                    createPost(result);
+                }
+            }
+        };
+    }
+
+    public void showMemory(){
+
+    }
+
 
     @Override
     public void onStart() {
